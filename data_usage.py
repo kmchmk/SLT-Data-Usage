@@ -7,7 +7,6 @@ config.read('credentials.ini')
 
 username = config['DEFAULT']['username']
 password = urllib.parse.quote(config['DEFAULT']['password'])
-subscriberid = config['DEFAULT']['subscriberid']
 x_ibm_client_id = config['DEFAULT']['x_ibm_client_id']
 
 
@@ -19,7 +18,8 @@ def get_data_usage():
     response = requests.request("POST", url, data=payload, headers=headers)
     response = json.loads(response.text)
     access_token = response["access_token"]
-
+    subscriberid = response["metadata"]
+    
     # Get the data usage
     url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasservices/dashboard/summary"
     headers = {

@@ -1,2 +1,5 @@
 __pycache__/
 *.ini
+*.exe
+build/*
+dist/*

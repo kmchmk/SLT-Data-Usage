@@ -11,3 +11,8 @@ Initial setup:
 pip install pystray
 pip install requests
 ```
+
+Create executable:
+```
+pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'system_tray.py'
+```
