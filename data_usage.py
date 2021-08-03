@@ -1,34 +1,39 @@
-from os import access
-import requests, json, urllib.parse
-import configparser
+from os import access, system
+import read_write
+import requests
+import json
+import urllib.parse
+import input_ui
 
-config = configparser.ConfigParser()
-config.read('credentials.ini')
-
-username = config['DEFAULT']['username']
-password = urllib.parse.quote(config['DEFAULT']['password'])
-x_ibm_client_id = config['DEFAULT']['x_ibm_client_id']
+X_IBM_CLIENT_ID = '622cc49f-6067-415e-82cd-04b1b76f6377'
 
 
 def get_data_usage():
+    credentials = read_write.readCredentialsFromFile()
     # Get access token first
     url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasoauth/oauth2/token"
-    payload = "client_id={2}&grant_type=password&password={1}&scope=scope1&username={0}".format(username, password, x_ibm_client_id)
-    headers = { 'content-type': "application/x-www-form-urlencoded" }
+    payload = "client_id={2}&grant_type=password&password={1}&scope=scope1&username={0}".format(
+        credentials['username'], urllib.parse.quote(credentials['password']), X_IBM_CLIENT_ID)
+    headers = {'content-type': "application/x-www-form-urlencoded"}
     response = requests.request("POST", url, data=payload, headers=headers)
     response = json.loads(response.text)
-    access_token = response["access_token"]
-    subscriberid = response["metadata"]
-    
-    # Get the data usage
-    url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasservices/dashboard/summary"
-    headers = {
-        'subscriberid': subscriberid,
-        'x-ibm-client-id': x_ibm_client_id,
-        'authorization': "Bearer {}".format(access_token)
-        }
-    response = requests.request("GET", url, headers=headers)
-    response = json.loads(response.text)
-    data_usage =  response["vas_data_summary"]["used"]
 
-    return data_usage
+    try:
+        access_token = response["access_token"]
+        subscriberid = response["metadata"]
+
+        # Get the data usage
+        url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasservices/dashboard/summary"
+        headers = {
+            'subscriberid': subscriberid,
+            'x-ibm-client-id': X_IBM_CLIENT_ID,
+            'authorization': "Bearer {}".format(access_token)
+        }
+        response = requests.request("GET", url, headers=headers)
+        response = json.loads(response.text)
+        data_usage = response["vas_data_summary"]["used"]
+
+        return data_usage
+    except:
+        input_ui.change_account(None)
+        return 'X'
