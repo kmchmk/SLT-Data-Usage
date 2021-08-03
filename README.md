@@ -14,5 +14,5 @@ pip install requests
 
 Create executable:
 ```
-pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'system_tray.py'
+pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'system_tray.py' --name 'SLT_Usage'
 ```
