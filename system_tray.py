@@ -4,7 +4,6 @@ from PIL import Image, ImageDraw, ImageFont
 import time
 import random
 import threading
-import sys
 import data_usage
 import input_ui
 
@@ -16,7 +15,6 @@ def get_empty_image(): return Image.new('RGBA', (size, size//2))  # Empty image
 
 finished = False
 refresh_itr_duration = 120  # seconds
-stop_itr_duration = 3  # seconds
 
 
 def refresh(icon):
@@ -28,27 +26,26 @@ def refresh(icon):
     icon.icon = image
 
 
-# Exit method should be faster than refresh interval. So we have 2 iterations here.
 def update_forever(icon):
-    refresh(icon)
-    seconds_passed = 0
     while not finished:
-        time.sleep(stop_itr_duration)
-        seconds_passed += stop_itr_duration
-        if seconds_passed >= refresh_itr_duration:
-            refresh(icon)
-            seconds_passed = 0
+        refresh(icon)
+        time.sleep(refresh_itr_duration)
+    icon.stop()
 
 
 def exit_method(icon):
     global finished
     finished = True
-    icon.stop()
+    icon.visible = False
 
 
 menu = (pystray.MenuItem('Refresh', refresh), pystray.MenuItem(
     'Change account', input_ui.change_account), pystray.MenuItem('Exit', exit_method))
 icon = pystray.Icon("icon1", get_empty_image(), "SLT Daily Usage (GB)", menu)
-icon.visible = True
-icon.run(setup=update_forever)
-icon.stop()
+
+update_thread = threading.Thread(target=update_forever, args=(icon,))
+update_thread.start()
+
+icon.run()
+
+update_thread.join()
