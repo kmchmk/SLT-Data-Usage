@@ -33,8 +33,8 @@ class DataUsage:
                 'x-ibm-client-id': self.X_IBM_CLIENT_ID,
                 'authorization': "Bearer {}".format(access_token)
             }
-            self.response = json.loads(requests.request(
-                "GET", url, headers=headers).text)
+            self.response = json.loads(requests.request("GET", url,
+                                                        headers=headers).text)
             self.package_name = self.response["my_package_info"]["package_name"]
 
         except:
@@ -74,12 +74,13 @@ class DataUsage:
         if(len(self.response["my_package_info"]["usageDetails"]) > 0):
             anytime_used = self.response["my_package_info"]["usageDetails"][0]["used"]
             anytime_limit = self.response["my_package_info"]["usageDetails"][0]["limit"]
-            report += "\nAnytime:  {} / {}".format(anytime_used, anytime_limit)
+            report += "\nAnytime:  {} / {}".format(anytime_used,
+                                                   anytime_limit if anytime_limit else "Unlimited")
 
             if(len(self.response["my_package_info"]["usageDetails"]) > 1):
                 total_used = self.response["my_package_info"]["usageDetails"][1]["used"]
                 total_limit = self.response["my_package_info"]["usageDetails"][1]["limit"]
-                report += "\nNight:  {} / {}".format(float(total_used) - float(
-                    anytime_used), float(total_limit) - float(anytime_limit))
+                report += "\nNight:  {} / {}".format(round(float(total_used) - float(anytime_used), 1),
+                                                     round(float(total_limit) - float(anytime_limit), 1))
                 report += "\nTotal:  {} / {}".format(total_used, total_limit)
         return report

@@ -37,8 +37,9 @@ def exit_method(icon):
     icon.stop()
 
 
-menu = (pystray.MenuItem('Refresh', refresh), pystray.MenuItem(
-    'Change account', input_ui.change_account), pystray.MenuItem('Exit', exit_method))
+menu = (pystray.MenuItem('Refresh', refresh),
+        pystray.MenuItem('Change account', input_ui.change_account),
+        pystray.MenuItem('Exit', exit_method))
 icon = pystray.Icon("icon1", get_empty_image(), "SLT Daily Usage (GB)", menu)
 
 icon.run(update_forever)

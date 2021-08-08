@@ -1,26 +1,39 @@
 # SLT-Data-Usage
 This program can get your SLT data usage and display it in the system tray.
+|||
+:-------------------------:|:-------------------------:
+![Summary](https://user-images.githubusercontent.com/12431727/128629535-049ef77a-0754-4616-993e-41b22bf6ff69.png) |  ![SLT Usage Report](https://user-images.githubusercontent.com/12431727/128629534-794db86c-1296-46d4-b0c9-106e5fe4d152.png)
+_Summary is always visible_        |  _Hover over to see the full report_
+
 Tested only on Windows 10.
-
-For OSX : [@kaveenr](https://gist.github.com/kaveenr/a820616adf2f5d9d82db1b1250bf15f3#file-readme-md)
-
---------------------------------------
-
-#### Summary is always visible.
-
-![image](https://user-images.githubusercontent.com/12431727/128552259-83c8b8ea-4b40-476a-ad6d-f8761d81604a.png)
+_For OSX see [@kaveenr](https://gist.github.com/kaveenr/a820616adf2f5d9d82db1b1250bf15f3#file-readme-md)'s script_
 
 --------------------------------------
 
-#### Hover over to see the full report.
 
-![SLT Usage Report](https://user-images.githubusercontent.com/12431727/128612361-5a16e5c8-4857-4e9f-8283-acf9ce5e96b3.png)
+### Download and install the [latest executable](https://github.com/kmchmk/SLT-Data-Usage/releases/latest) using following instructions.
 
---------------------------------------
+#### How to install to run forever:
 
-Download and run the [latest executable](https://github.com/kmchmk/SLT-Data-Usage/releases/latest).
+Prerequisites:
+* Windows 10 machine
+* SLT broadband [account](https://internetvas.slt.lk/login) credentials
 
-Refresh interval is 120 secs, but it can easily be changed in the code.
+Steps:
+
+1. Go to the [latest release](https://github.com/kmchmk/SLT-Data-Usage/releases/latest) page and expand "Assets" section.
+2. Download the SLT_Usage_\<version\>.zip. Your browser may hesitate, so you may have to allow it in the Downloads section.
+3. Extract the downloaded zip and you will find the SLT_Usage.exe file inside it.
+4. Copy the SLT_Usage.exe file to any location. Do not paste if it asks for admin permission to continue.
+   (Recommended location: C:\\Users\\%USERPROFILE%\\AppData\\Local\\Programs\\SLT_Usage\\SLT_Usage.exe)
+5. Right click on the SLT_Usage.exe in new location and select "Copy".
+6. Go to C:\\Users\\%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\
+7. Right click on the background and select "Paste shortcut".
+8. Double click the new shortcut and save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
+9. You will see a system tray icon containing "X" mark. Right click it and "Refresh".
+10. Move it out to the taskbar from system tray, if you want to see it directly all the time
+
+Auto refresh interval is 120 secs.
 
 --------------------------------------
 
