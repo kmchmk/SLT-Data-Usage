@@ -2,6 +2,8 @@
 This program can get your SLT data usage and display it in the system tray.
 Tested only on Windows 10.
 
+For OSX : [@kaveenr](https://gist.github.com/kaveenr/a820616adf2f5d9d82db1b1250bf15f3#file-readme-md)
+
 --------------------------------------
 
 #### Summary is always visible.
