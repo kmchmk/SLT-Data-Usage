@@ -11,7 +11,7 @@ _For OSX see [@kaveenr](https://gist.github.com/kaveenr/a820616adf2f5d9d82db1b12
 --------------------------------------
 
 
-### Download and install the [latest executable](https://github.com/kmchmk/SLT-Data-Usage/releases/latest) using following instructions.
+### Download and install the [latest](https://github.com/kmchmk/SLT-Data-Usage/releases/latest) version using following instructions.
 
 #### How to install to run forever:
 
@@ -21,17 +21,12 @@ Prerequisites:
 
 Steps:
 
-1. Go to the [latest release](https://github.com/kmchmk/SLT-Data-Usage/releases/latest) page and expand "Assets" section.
-2. Download the SLT_Usage_\<version\>.zip. Your browser may hesitate, so you may have to allow it in the Downloads section.
-3. Extract the downloaded zip and you will find the SLT_Usage.exe file inside it.
-4. Copy the SLT_Usage.exe file to any location. Do not paste if it asks for admin permissions to continue.
-   (Recommended location: C:\\Users\\%USERPROFILE%\\AppData\\Local\\Programs\\SLT_Usage\\SLT_Usage.exe)
-5. Right click on the SLT_Usage.exe in new location and select "Copy".
-6. Go to C:\\Users\\%USERPROFILE%\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\
-7. Right click on the background and select "Paste shortcut".
-8. Double click the new shortcut and save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
-9. You will see a system tray icon containing "X" mark. Right click it and "Refresh".
-10. Move it out to the taskbar from system tray, if you want to see it directly all the time.
+1. Download the [SLT_Usage_Web_Installer.exe](https://github.com/kmchmk/SLT-Data-Usage/releases/download/v1.3/SLT_Usage_Web_Installer.exe) file. Your browser may hesitate, so you may have to allow it in the Downloads section.
+2. Install the downloaded file.
+2. App will start automatically after the installation.
+3. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
+4. You will see a system tray icon containing "X" mark. Right click it and "Refresh".
+5. Move it out to the taskbar from system tray, if you want to see it directly all the time.
 
 _Auto refresh interval is 120 secs._
 
