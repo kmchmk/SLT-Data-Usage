@@ -30,16 +30,16 @@ def update_forever(icon):
     while icon.visible:
         refresh(icon)
         time.sleep(refresh_itr_duration)
+    icon.stop()
 
 
 def exit_method(icon):
     icon.visible = False
-    icon.stop()
 
 
 menu = (pystray.MenuItem('Refresh', refresh),
         pystray.MenuItem('Change account', input_ui.change_account),
         pystray.MenuItem('Exit', exit_method))
-icon = pystray.Icon("icon1", get_empty_image(), "SLT Daily Usage (GB)", menu)
+icon = pystray.Icon("icon_name", get_empty_image(), "Starting...", menu)
 
 icon.run(update_forever)
