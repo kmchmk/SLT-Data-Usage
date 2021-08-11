@@ -34,18 +34,24 @@ _Auto refresh interval is 120 secs._
 
 ### Following instructions are for developers only.
 
-##### If you are building from code
+##### If you are running/building from code
 
 Initial setup:
 ```
-pip install pystray
-pip install requests
+pip install pystray requests
+```
+
+To run from code:
+```
+python SLT_Usage.py
 ```
 
 Create executable:
 ```
-pyinstaller --noconsole --onefile 'system_tray.py' --name 'SLT_Usage'
+pip install pyinstaller
+pyinstaller --noconsole --onefile 'SLT_Usage.py'
 ```
+
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
 ```
 iscc InnoSetup_offline_installer_script.iss
