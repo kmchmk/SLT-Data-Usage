@@ -1,52 +1,39 @@
 from tkinter import *
 import read_write
 
-root = None
-TFUsername = None
-TFPassword = None
 
+class CredentialWindow:
 
-def getUsername():
-    global root, TFUsername
-    userInput = TFUsername.get()
-    return userInput
+    def __init__(self, credential_manager):
 
+        self._credential_manager = credential_manager
 
-def getPassword():
-    global root, TFPassword
-    userInput = TFPassword.get()
-    return userInput
+        self._root = Tk()
+        self._root.resizable(False, False)
+        self._root.title('SLT Credentials')
 
+        Label(self._root, text='Username :').grid(row=0, column=0)
+        Label(self._root, text='Password :').grid(row=1, column=0)
 
-def functionSave():
-    global root
-    read_write.writeCredentialsToFile(getUsername(), getPassword())
-    root.destroy()
+        self._tf_username = Entry(self._root)
+        self._tf_username.grid(row=0, column=1)
+        self._tf_password = Entry(self._root, justify=LEFT)
+        self._tf_password.grid(row=1, column=1)
 
+        frame = Frame(self._root)
+        frame.grid(row=2, columnspan=2)
+        Button(frame, text='Save',
+               command=self._function_save).grid(row=0, column=0,)
+        Button(frame, text='Cancel',
+               command=self._function_cancel).grid(row=0, column=1)
 
-def functionCancel():
-    global root
-    root.destroy()
+    def _function_save(self):
+        self._credential_manager.write_credentials_to_file(
+            self._tf_username.get(), self._tf_password.get())
+        self._root.destroy()
 
+    def _function_cancel(self):
+        self._root.destroy()
 
-def change_account(icon):
-    global root, TFUsername, TFPassword
-    root = Tk()
-    root.resizable(False, False)
-    # root.overrideredirect(1)
-    root.title('SLT Credentials')
-
-    Label(root, text='Username :').grid(row=0, column=0)
-    Label(root, text='Password :').grid(row=1, column=0)
-
-    TFUsername = Entry(root)
-    TFUsername.grid(row=0, column=1)
-    TFPassword = Entry(root, justify=LEFT)
-    TFPassword.grid(row=1, column=1)
-
-    frame = Frame(root)
-    frame.grid(row=2, columnspan=2)
-    Button(frame, text='Save', command=functionSave).grid(row=0, column=0,)
-    Button(frame, text='Cancel', command=functionCancel).grid(row=0, column=1)
-
-    root.mainloop()
+    def start_window(self):
+        self._root.mainloop()
