@@ -1,4 +1,4 @@
-import pystray._win32
+import pystray
 from PIL import ImageDraw, ImageFont
 import PIL  # Imported again due to multiple "Image" classes
 import time
@@ -7,9 +7,18 @@ import json
 import urllib.parse
 import base64
 from tkinter import *
+import platform
 
 SIZE = 100
-FONT_TYPE = ImageFont.truetype("tahoma.ttf", SIZE//2)
+FONT_TYPE = None
+if platform.system() == "Windows":
+    FONT_TYPE = ImageFont.truetype("tahoma.ttf", SIZE//2)
+elif platform.system() == "Linux": # Probably Ubuntu
+    FONT_TYPE = ImageFont.truetype("UbuntuMono-R.ttf", SIZE//2)
+elif platform.system() == "Darwin": # MacOS
+    FONT_TYPE = ImageFont.truetype("Symbol.ttf", SIZE//2)
+else:
+    raise Exception("Sorry, we do not support '{}' OS yet.".format(platform.system()))
 # ToDo - I used yellow below because of the System wide Dark theme
 FONT_COLOUR = 'yellow'
 TOP_LEFT = (0, 0)

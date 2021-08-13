@@ -49,7 +49,7 @@ python SLT_Usage.py
 Create executable:
 ```
 pip install pyinstaller
-pyinstaller --noconsole --onefile 'SLT_Usage.py'
+pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'SLT_Usage.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
