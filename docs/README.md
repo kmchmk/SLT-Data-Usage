@@ -45,11 +45,14 @@ pip install pystray requests
 sudo apt install gir1.2-appindicator3-0.1
 sudo apt install python3-tk
 sudo apt purge fcitx-module-dbus
+
+# For MacOS
+brew install python-tk
 ```
 
 To run from code:
 ```
-python SLT_Usage.py
+python3 SLT_Usage.py
 ```
 
 Create executable:
