@@ -38,7 +38,13 @@ _Auto refresh interval is 120 secs._
 
 Initial setup:
 ```
+# For all OSs
 pip install pystray requests
+
+# For Ubuntu
+sudo apt install gir1.2-appindicator3-0.1
+sudo apt install python3-tk
+sudo apt purge fcitx-module-dbus
 ```
 
 To run from code:
