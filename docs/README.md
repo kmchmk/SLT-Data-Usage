@@ -57,8 +57,17 @@ python3 SLT_Usage.py
 
 Create executable:
 ```
-pip install pyinstaller
+# For all OSs
+pip3 install pyinstaller
+
+# For Windows
 pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'SLT_Usage.py'
+
+# For Ubuntu
+pyinstaller --hidden-import 'pystray._appindicator' --hidden-import 'pystray._gtk' --hidden-import 'pystray._xorg' --noconsole --onefile 'SLT_Usage.py'
+
+# For MacOS
+pyinstaller --hidden-import 'pystray._darwin' --noconsole --onefile 'SLT_Usage.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
