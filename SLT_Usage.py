@@ -10,6 +10,8 @@ from tkinter import *
 import platform
 import sys
 
+from requests.models import Response
+
 SIZE = 100
 FONT_TYPE = None
 if platform.system() == "Windows":
@@ -30,47 +32,66 @@ REFRESH_INTERVAL = 120  # seconds
 class CredentialManager:
 
     CREDENTIALS_FILE_NAME = 'credentials.json'
+    AUTH_URL = "https://omniscapp.slt.lk/mobitelint/slt/sltvasoauth/oauth2/token"
 
     def __init__(self):
         self._load_credentials_from_file()
 
-    def get_username(self):
-        return self._username
+    def get_refresh_token(self):
+        return self._refresh_token
 
-    def get_password(self):
-        return self._password
+    def get_subscriber_id(self):
+        return self._subscriber_id
 
-    def write_credentials_to_file(self, username, password):
+    def generate_and_write_refresh_token_to_file(self, username, password):
+        payload = "client_id={2}&grant_type=password&password={1}&scope=scope1&username={0}".format(
+            username, urllib.parse.quote(password), DataUsage.X_IBM_CLIENT_ID)
+        headers = {'content-type': "application/x-www-form-urlencoded"}
+        response = requests.request("POST", self.AUTH_URL, data=payload, headers=headers)
+        response = json.loads(response.text)
+
+        try:
+            refresh_token = response["refresh_token"]
+            subscriber_id = response["metadata"]
+            self.write_credentials_to_file(refresh_token, subscriber_id)
+        except:
+            self._refresh_token = ""  # ToDo - Empty or None
+
+    def write_credentials_to_file(self, refresh_token, subscriber_id=None):
+        if(subscriber_id is None):  # This is to overload the method
+            subscriber_id = self._subscriber_id
+
         credentials = {
-            "username": username,
-            "password": password
+            "refresh_token": refresh_token,
+            "subscriber_id": subscriber_id
         }
 
-        # Encrypt credentials -> credentialBytes
-        credentialJson = json.dumps(credentials)
-        credentialBytes = base64.b64encode(credentialJson.encode('ascii'))
+        # Encrypt credentials -> credential_bytes
+        credential_json = json.dumps(credentials)
+        credential_bytes = base64.b64encode(credential_json.encode('ascii'))
 
         # Write to file
-        with open(self.CREDENTIALS_FILE_NAME, 'wb') as credentialFile:
-            credentialFile.write(credentialBytes)
+        with open(self.CREDENTIALS_FILE_NAME, 'wb') as credential_file:
+            credential_file.write(credential_bytes)
 
-        self._username = username
-        self._password = password
+        self._refresh_token = refresh_token
+        self._subscriber_id = subscriber_id
 
     def _load_credentials_from_file(self):
         try:
             # Read from file
             with open(self.CREDENTIALS_FILE_NAME, 'rb') as credentialFile:
-                credentialBytes = credentialFile.read()
+                credential_bytes = credentialFile.read()
 
-            # Decrypt credentialBytes -> credentials
-            credentialJson = base64.b64decode(credentialBytes).decode('ascii')
-            credentials = json.loads(credentialJson)
-            self._username = credentials["username"]
-            self._password = credentials["password"]
+            # Decrypt credential_bytes -> credentials
+            credential_json = base64.b64decode(credential_bytes).decode('ascii')
+            credentials = json.loads(credential_json)
+
+            self._refresh_token = credentials["refresh_token"]
+            self._subscriber_id = credentials["subscriber_id"]
         except:
-            self._username = ""
-            self._password = ""
+            self._refresh_token = ""
+            self._subscriber_id = ""
 
 
 class CredentialWindow:
@@ -95,13 +116,11 @@ class CredentialWindow:
 
         frame = Frame(self._root)
         frame.grid(row=2, columnspan=2)
-        Button(frame, text='Save',
-               command=self._function_save).grid(row=0, column=0,)
-        Button(frame, text='Cancel',
-               command=self._function_cancel).grid(row=0, column=1)
+        Button(frame, text='Save', command=self._function_save).grid(row=0, column=0,)
+        Button(frame, text='Cancel', command=self._function_cancel).grid(row=0, column=1)
 
     def _function_save(self):
-        self._credential_manager.write_credentials_to_file(
+        self._credential_manager.generate_and_write_refresh_token_to_file(
             self._tf_username.get(), self._tf_password.get())
         self._root.destroy()
 
@@ -121,28 +140,26 @@ class DataUsage:
 
     def refresh(self):
         # Get access token first
-        url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasoauth/oauth2/token"
-        payload = "client_id={2}&grant_type=password&password={1}&scope=scope1&username={0}".format(
-            self._credential_manager.get_username(), urllib.parse.quote(self._credential_manager.get_password()), self.X_IBM_CLIENT_ID)
+        payload = "client_id={1}&grant_type=refresh_token&refresh_token={0}&scope=scope1".format(
+            urllib.parse.quote(self._credential_manager.get_refresh_token()), self.X_IBM_CLIENT_ID)
         headers = {'content-type': "application/x-www-form-urlencoded"}
-        response = requests.request("POST", url, data=payload, headers=headers)
+        response = requests.request("POST", CredentialManager.AUTH_URL, data=payload, headers=headers)
         response = json.loads(response.text)
-
         try:
             access_token = response["access_token"]
-            subscriberid = response["metadata"]
+            refresh_token = response["refresh_token"]
+
+            self._credential_manager.write_credentials_to_file(refresh_token)
 
             # Get the data usage
             url = "https://omniscapp.slt.lk/mobitelint/slt/sltvasservices/dashboard/summary"
             headers = {
-                'subscriberid': subscriberid,
+                'subscriberid': self._credential_manager.get_subscriber_id(),
                 'x-ibm-client-id': self.X_IBM_CLIENT_ID,
                 'authorization': "Bearer {}".format(access_token)
             }
-            self._response = json.loads(requests.request("GET", url,
-                                                         headers=headers).text)
+            self._response = json.loads(requests.request("GET", url, headers=headers).text)
             self.package_name = self._response["my_package_info"]["package_name"]
-
         except:
             self._response = None
         return bool(self._response)
@@ -158,36 +175,37 @@ class DataUsage:
     def get_usage_report(self):
         if(not self._response):
             return "Incorrect credentials..."
+
         # Let's creat a full report
         report = self.package_name
 
         if(self._response["bonus_data_summary"]):
             bonus_used = self._response["bonus_data_summary"]["used"]
             bonus_limit = self._response["bonus_data_summary"]["limit"]
-            report += "\nBonus:  {} / {}".format(bonus_used, bonus_limit)
+            report += "\nBonus: {} / {}".format(bonus_used, bonus_limit)
 
         if(self._response["vas_data_summary"]):
             vas_used = self._response["vas_data_summary"]["used"]
             vas_limit = self._response["vas_data_summary"]["limit"]
-            report += "\nVAS:  {} / {}".format(vas_used, vas_limit)
+            report += "\nVAS: {} / {}".format(vas_used, vas_limit)
 
         if(self._response["extra_gb_data_summary"]):
             extra_gb_used = self._response["extra_gb_data_summary"]["used"]
             extra_gb_limit = self._response["extra_gb_data_summary"]["limit"]
-            report += "\nExtra:  {} / {}".format(extra_gb_used, extra_gb_limit)
+            report += "\nExtra: {} / {}".format(extra_gb_used, extra_gb_limit)
 
         if(len(self._response["my_package_info"]["usageDetails"]) > 0):
             anytime_used = self._response["my_package_info"]["usageDetails"][0]["used"]
             anytime_limit = self._response["my_package_info"]["usageDetails"][0]["limit"]
-            report += "\nAnytime:  {} / {}".format(anytime_used,
-                                                   anytime_limit if anytime_limit else "Unlimited")
+            report += "\nAnytime: {} / {}".format(anytime_used,
+                                                  anytime_limit if anytime_limit else "Unlimited")
 
             if(len(self._response["my_package_info"]["usageDetails"]) > 1):
                 total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
                 total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
-                report += "\nNight:  {} / {}".format(round(float(total_used) - float(anytime_used), 1),
-                                                     round(float(total_limit) - float(anytime_limit), 1))
-                report += "\nTotal:  {} / {}".format(total_used, total_limit)
+                report += "\nNight: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
+                                                    round(float(total_limit) - float(anytime_limit), 1))
+                report += "\nTotal: {} / {}".format(total_used, total_limit)
         return report
 
 
@@ -204,8 +222,7 @@ class Main:
         image = self.get_empty_image()
         draw = ImageDraw.Draw(image)
         self._data_usage.refresh()
-        draw.text(TOP_LEFT, self._data_usage.get_summary(),
-                  font=FONT_TYPE, fill=FONT_COLOUR)
+        draw.text(TOP_LEFT, self._data_usage.get_summary(), font=FONT_TYPE, fill=FONT_COLOUR)
         icon.icon = image
         icon.title = self._data_usage.get_usage_report()
 
@@ -227,8 +244,7 @@ class Main:
         menu = (pystray.MenuItem('Refresh', self.refresh),
                 pystray.MenuItem('Exit', self.exit_method),
                 pystray.MenuItem('Logout & exit', self.logout_and_exit))
-        icon = pystray.Icon(
-            "icon_name", self.get_empty_image(), "Starting...", menu)
+        icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
 
 
