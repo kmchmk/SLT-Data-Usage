@@ -38,18 +38,36 @@ _Auto refresh interval is 120 secs._
 
 Initial setup:
 ```
+# For all OSs
 pip install pystray requests
+
+# For Ubuntu
+sudo apt install gir1.2-appindicator3-0.1
+sudo apt install python3-tk
+sudo apt purge fcitx-module-dbus
+
+# For MacOS
+brew install python-tk
 ```
 
 To run from code:
 ```
-python SLT_Usage.py
+python3 SLT_Usage.py
 ```
 
 Create executable:
 ```
-pip install pyinstaller
-pyinstaller --noconsole --onefile 'SLT_Usage.py'
+# For all OSs
+pip3 install pyinstaller
+
+# For Windows
+pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'SLT_Usage.py'
+
+# For Ubuntu
+pyinstaller --hidden-import 'pystray._appindicator' --hidden-import 'pystray._gtk' --hidden-import 'pystray._xorg' --noconsole --onefile 'SLT_Usage.py'
+
+# For MacOS
+pyinstaller --hidden-import 'pystray._darwin' --noconsole --onefile 'SLT_Usage.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:

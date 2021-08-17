@@ -1,4 +1,4 @@
-import pystray._win32
+import pystray
 from PIL import ImageDraw, ImageFont
 import PIL  # Imported again due to multiple "Image" classes
 import time
@@ -7,9 +7,20 @@ import json
 import urllib.parse
 import base64
 from tkinter import *
+import platform
+import sys
 
 SIZE = 100
-FONT_TYPE = ImageFont.truetype("tahoma.ttf", SIZE//2)
+FONT_TYPE = None
+if platform.system() == "Windows":
+    FONT_TYPE = ImageFont.truetype("tahoma.ttf", SIZE//2)
+elif platform.system() == "Linux":  # Probably Ubuntu
+    FONT_TYPE = ImageFont.truetype("UbuntuMono-R.ttf", SIZE//2)
+elif platform.system() == "Darwin":  # MacOS
+    FONT_TYPE = ImageFont.truetype("Symbol.ttf", SIZE//2)
+else:
+    raise Exception(
+        "Sorry, we do not support '{}' OS yet.".format(platform.system()))
 # ToDo - I used yellow below because of the System wide Dark theme
 FONT_COLOUR = 'yellow'
 TOP_LEFT = (0, 0)
@@ -71,6 +82,8 @@ class CredentialWindow:
         self._root = Tk()
         self._root.resizable(False, False)
         self._root.title('SLT Credentials')
+        # Close button event
+        self._root.protocol("WM_DELETE_WINDOW", self._function_cancel)
 
         Label(self._root, text='Username :').grid(row=0, column=0)
         Label(self._root, text='Password :').grid(row=1, column=0)
@@ -94,6 +107,7 @@ class CredentialWindow:
 
     def _function_cancel(self):
         self._root.destroy()
+        sys.exit()
 
     def start_window(self):
         self._root.mainloop()
@@ -130,9 +144,8 @@ class DataUsage:
             self.package_name = self._response["my_package_info"]["package_name"]
 
         except:
-            credential_window = CredentialWindow(self._credential_manager)
-            credential_window.start_window()
             self._response = None
+        return bool(self._response)
 
     def get_summary(self):
         if(not self._response):
@@ -180,9 +193,9 @@ class DataUsage:
 
 class Main:
 
-    def __init__(self):
-        self._credential_manager = CredentialManager()
-        self._data_usage = DataUsage(self._credential_manager)
+    def __init__(self, credential_manager, data_usage):
+        self._credential_manager = credential_manager
+        self._data_usage = data_usage
 
     def get_empty_image(self):
         return PIL.Image.new('RGBA', (SIZE, SIZE//2))  # Empty image
@@ -203,18 +216,28 @@ class Main:
             time.sleep(REFRESH_INTERVAL)
         icon.stop()
 
-    def open_credential_window(self, icon):
-        credential_window = CredentialWindow(self._credential_manager)
-        credential_window.start_window()
-
     def exit_method(self, icon):
         icon.visible = False
 
+    def logout_and_exit(self, icon):
+        self._credential_manager.write_credentials_to_file("", "")
+        self.exit_method(icon)
 
-main = Main()
-menu = (pystray.MenuItem('Refresh', main.refresh),
-        pystray.MenuItem('Change account', main.open_credential_window),
-        pystray.MenuItem('Exit', main.exit_method))
-icon = pystray.Icon("icon_name", main.get_empty_image(), "Starting...", menu)
+    def start_tray_icon(self):
+        menu = (pystray.MenuItem('Refresh', self.refresh),
+                pystray.MenuItem('Exit', self.exit_method),
+                pystray.MenuItem('Logout & exit', self.logout_and_exit))
+        icon = pystray.Icon(
+            "icon_name", self.get_empty_image(), "Starting...", menu)
+        icon.run(self.update_forever)
 
-icon.run(main.update_forever)
+
+credential_manager = CredentialManager()
+data_usage = DataUsage(credential_manager)
+
+while(not data_usage.refresh()):
+    credential_window = CredentialWindow(credential_manager)
+    credential_window.start_window()
+
+main = Main(credential_manager, data_usage)
+main.start_tray_icon()
