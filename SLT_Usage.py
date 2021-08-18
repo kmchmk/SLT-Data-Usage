@@ -9,6 +9,7 @@ import base64
 from tkinter import *
 import platform
 import sys
+import os.path
 
 from requests.models import Response
 
@@ -31,7 +32,7 @@ REFRESH_INTERVAL = 120  # seconds
 
 class CredentialManager:
 
-    CREDENTIALS_FILE_NAME = 'credentials.json'
+    CREDENTIALS_FILE_NAME = os.path.join(os.path.expanduser("~"), '.slt_usage.cache')
     AUTH_URL = "https://omniscapp.slt.lk/mobitelint/slt/sltvasoauth/oauth2/token"
 
     def __init__(self):
