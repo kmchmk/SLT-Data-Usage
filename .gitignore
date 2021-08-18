@@ -4,3 +4,4 @@ __pycache__/
 *.spec
 build/*
 dist/*
+.DS_Store
