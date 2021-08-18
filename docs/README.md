@@ -1,9 +1,9 @@
 # SLT-Data-Usage
 This program can get your SLT data usage and display it in the system tray.
-|||
-:-------------------------:|:-------------------------:
-![Summary](https://user-images.githubusercontent.com/12431727/128629535-049ef77a-0754-4616-993e-41b22bf6ff69.png) |  ![SLT Usage Report](https://user-images.githubusercontent.com/12431727/128629534-794db86c-1296-46d4-b0c9-106e5fe4d152.png)
-_Summary is always visible_        |  _Hover over to see the full report_
+||||
+:-------------------------:|:-------------------------:|:-------------------------:
+![Summary](https://user-images.githubusercontent.com/12431727/128629535-049ef77a-0754-4616-993e-41b22bf6ff69.png) | ![SLT Usage Report on Windows](https://user-images.githubusercontent.com/12431727/128629534-794db86c-1296-46d4-b0c9-106e5fe4d152.png) | ![SLT Usage Report on MacOS](https://user-images.githubusercontent.com/12431727/129947902-0a71adde-b447-4ef4-a202-f80806ee827c.png)|
+_Summary is always visible_ | _Hover over to see the full report_ | _Same on MacOS_ |
 
 Tested on Windows (10) and MacOS (Big Sur).
 _For OSX Xbar plugin, see [@kaveenr](https://gist.github.com/kaveenr/a820616adf2f5d9d82db1b1250bf15f3#file-readme-md)'s script._
