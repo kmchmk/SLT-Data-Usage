@@ -1,17 +1,15 @@
 import pystray
-from PIL import ImageDraw, ImageFont
-import PIL  # Imported again due to multiple "Image" classes
+from tkinter import *
+from PIL import ImageDraw, ImageFont, Image
 import time
 import requests
 import json
 import urllib.parse
 import base64
-from tkinter import *
 import platform
 import sys
 import os.path
-
-from requests.models import Response
+import darkdetect
 
 SIZE = 100
 FONT_TYPE = None
@@ -24,8 +22,6 @@ elif platform.system() == "Darwin":  # MacOS
 else:
     raise Exception(
         "Sorry, we do not support '{}' OS yet.".format(platform.system()))
-# ToDo - I used yellow below because of the System wide Dark theme
-FONT_COLOUR = 'yellow'
 TOP_LEFT = (0, 0)
 REFRESH_INTERVAL = 120  # seconds
 
@@ -210,20 +206,28 @@ class DataUsage:
         return report
 
 
-class Main:
+class SystemTrayIcon:
 
     def __init__(self, credential_manager, data_usage):
         self._credential_manager = credential_manager
         self._data_usage = data_usage
 
     def get_empty_image(self):
-        return PIL.Image.new('RGBA', (SIZE, SIZE//2))  # Empty image
+        return Image.new('RGBA', (SIZE, SIZE//2))  # Empty image
+
+    def _get_font_colour(self):  # This doesn't support custom themes yet
+        if(platform.system() == "Linux"):  # Seems, Ubuntu top bar is always dark
+            return 'white'
+        elif(darkdetect.isDark()):
+            return 'white'
+        else:
+            return 'black'
 
     def refresh(self, icon):
         image = self.get_empty_image()
         draw = ImageDraw.Draw(image)
         self._data_usage.refresh()
-        draw.text(TOP_LEFT, self._data_usage.get_summary(), font=FONT_TYPE, fill=FONT_COLOUR)
+        draw.text(TOP_LEFT, self._data_usage.get_summary(), font=FONT_TYPE, fill=self._get_font_colour())
         icon.icon = image
         icon.title = self._data_usage.get_usage_report()
 
@@ -256,5 +260,5 @@ while(not data_usage.refresh()):
     credential_window = CredentialWindow(credential_manager)
     credential_window.start_window()
 
-main = Main(credential_manager, data_usage)
+main = SystemTrayIcon(credential_manager, data_usage)
 main.start_tray_icon()

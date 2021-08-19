@@ -50,7 +50,7 @@ _Auto refresh interval is 120 secs._
 Initial setup:
 ```
 # For all OSs
-pip install pystray requests
+pip install pystray requests darkdetect
 
 # For Ubuntu
 sudo apt install gir1.2-appindicator3-0.1
