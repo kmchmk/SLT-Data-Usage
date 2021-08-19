@@ -32,7 +32,7 @@ How to install:
 
 ## MacOS
 
-1. Download the  [SLT_Usage.zip](https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/SLT_Usage) file.
+1. Download the  [SLT_Usage.zip](https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/SLT_Usage.zip) file.
 2. Drag the downloaded file to Applications folder.
 3. Go to Applications folder, right click on the app icon and select open. You might not be able to run the app using launchpad at first.
 4. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
