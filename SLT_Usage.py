@@ -216,7 +216,9 @@ class SystemTrayIcon:
         return Image.new('RGBA', (SIZE, SIZE//2))  # Empty image
 
     def _get_font_colour(self):  # This doesn't support custom themes yet
-        if(darkdetect.isDark()):
+        if(platform.system() == "Linux"):  # Seems, Ubuntu top bar is always dark
+            return 'white'
+        elif(darkdetect.isDark()):
             return 'white'
         else:
             return 'black'
