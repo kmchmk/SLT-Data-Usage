@@ -203,6 +203,9 @@ class DataUsage:
                 report += "\nNight: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
                                                     round(float(total_limit) - float(anytime_limit), 1))
                 report += "\nTotal: {} / {}".format(total_used, total_limit)
+        
+        reported_time = self._response["my_package_info"]["reported_time"]
+        report += "\n[As at {}]".format(reported_time)
         return report
 
 
