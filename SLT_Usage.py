@@ -121,7 +121,9 @@ class CredentialWindow:
 
         self._root = Tk()
         self._root.resizable(False, False)
+        self._root.attributes('-topmost', True)
         self._root.title('SLT Credentials')
+        self._root.eval('tk::PlaceWindow . center')
         # Close button event
         self._root.protocol("WM_DELETE_WINDOW", self._function_cancel)
 
@@ -193,7 +195,7 @@ class DataUsage:
 
     def get_usage_report(self):
         if(not self._response):
-            return "Incorrect credentials..."
+            return "Error occured!\nPlease refresh again."
 
         # Let's creat a full report
         report = self.package_name
