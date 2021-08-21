@@ -9,21 +9,43 @@ import base64
 import platform
 import sys
 import os.path
+import os
 import darkdetect
 
-SIZE = 100
-FONT_TYPE = None
-if platform.system() == "Windows":
-    FONT_TYPE = ImageFont.truetype("tahoma.ttf", SIZE//2)
-elif platform.system() == "Linux":  # Probably Ubuntu
-    FONT_TYPE = ImageFont.truetype("UbuntuMono-R.ttf", SIZE//2)
-elif platform.system() == "Darwin":  # MacOS
-    FONT_TYPE = ImageFont.truetype("Symbol.ttf", SIZE//2)
-else:
-    raise Exception(
-        "Sorry, we do not support '{}' OS yet.".format(platform.system()))
-TOP_LEFT = (0, 0)
+
 REFRESH_INTERVAL = 120  # seconds
+
+
+class Utils:
+
+    _SIZE = 100
+    _TOP_LEFT = (0, 0)
+
+    def get_font_size():
+        return Utils._SIZE
+
+    def get_font_size_half():
+        return Utils.get_font_size()//2
+
+    def isUbuntu():
+        return platform.system() == "Linux"   # Probably Ubuntu
+
+    def get_font():
+        if platform.system() == "Windows":
+            return ImageFont.truetype("tahoma.ttf", Utils.get_font_size_half())
+        elif Utils.isUbuntu():
+            return ImageFont.truetype("UbuntuMono-R.ttf", Utils.get_font_size_half())
+        elif platform.system() == "Darwin":  # MacOS
+            return ImageFont.truetype("Symbol.ttf", Utils.get_font_size_half())
+        else:
+            raise Exception(
+                "Sorry, we do not support '{}' OS yet.".format(platform.system()))
+
+    def get_location():
+        return Utils._TOP_LEFT
+
+    def show_notification(title, body):
+        if Utils.isUbuntu(): os.system("notify-send '{}' '{}'".format(title, body))
 
 
 class CredentialManager:
@@ -203,7 +225,7 @@ class DataUsage:
                 report += "\nNight: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
                                                     round(float(total_limit) - float(anytime_limit), 1))
                 report += "\nTotal: {} / {}".format(total_used, total_limit)
-        
+
         reported_time = self._response["my_package_info"]["reported_time"]
         report += "\n[As at {}]".format(reported_time)
         return report
@@ -216,7 +238,7 @@ class SystemTrayIcon:
         self._data_usage = data_usage
 
     def get_empty_image(self):
-        return Image.new('RGBA', (SIZE, SIZE//2))  # Empty image
+        return Image.new('RGBA', (Utils.get_font_size(), Utils.get_font_size_half()))  # Empty image
 
     def _get_font_colour(self):  # This doesn't support custom themes yet
         if(platform.system() == "Linux"):  # Seems, Ubuntu top bar is always dark
@@ -230,7 +252,8 @@ class SystemTrayIcon:
         image = self.get_empty_image()
         draw = ImageDraw.Draw(image)
         self._data_usage.refresh()
-        draw.text(TOP_LEFT, self._data_usage.get_summary(), font=FONT_TYPE, fill=self._get_font_colour())
+        draw.text(Utils.get_location(), self._data_usage.get_summary(),
+                  font=Utils.get_font(), fill=self._get_font_colour())
         icon.icon = image
         icon.title = self._data_usage.get_usage_report()
 
@@ -240,6 +263,9 @@ class SystemTrayIcon:
             self.refresh(icon)
             time.sleep(REFRESH_INTERVAL)
         icon.stop()
+
+    def show_full_report(self, icon):
+        Utils.show_notification(" ", self._data_usage.get_usage_report())
 
     def exit_method(self, icon):
         icon.visible = False
@@ -252,6 +278,8 @@ class SystemTrayIcon:
         menu = (pystray.MenuItem('Refresh', self.refresh),
                 pystray.MenuItem('Exit', self.exit_method),
                 pystray.MenuItem('Logout & exit', self.logout_and_exit))
+        if(Utils.isUbuntu()):
+            menu = (pystray.MenuItem('Full report', self.show_full_report),) + menu
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
 
