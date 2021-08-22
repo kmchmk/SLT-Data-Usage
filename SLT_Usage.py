@@ -44,9 +44,6 @@ class Utils:
     def get_location():
         return Utils._TOP_LEFT
 
-    def show_notification(title, body):
-        if Utils.isUbuntu(): os.system("notify-send '{}' '{}'".format(title, body))
-
 
 class CredentialManager:
 
@@ -267,7 +264,7 @@ class SystemTrayIcon:
         icon.stop()
 
     def show_full_report(self, icon):
-        Utils.show_notification(" ", self._data_usage.get_usage_report())
+        icon.notify(self._data_usage.get_usage_report(), " ")
 
     def exit_method(self, icon):
         icon.visible = False
@@ -277,11 +274,10 @@ class SystemTrayIcon:
         self.exit_method(icon)
 
     def start_tray_icon(self):
-        menu = (pystray.MenuItem('Refresh', self.refresh),
-                pystray.MenuItem('Exit', self.exit_method),
-                pystray.MenuItem('Logout & exit', self.logout_and_exit))
-        if(Utils.isUbuntu()):
-            menu = (pystray.MenuItem('Full report', self.show_full_report),) + menu
+        menu = pystray.Menu(pystray.MenuItem('Refresh', self.refresh, default=True),
+                            pystray.MenuItem('Full report', self.show_full_report, visible=Utils.isUbuntu()),
+                            pystray.MenuItem('Exit', self.exit_method),
+                            pystray.MenuItem('Logout & exit', self.logout_and_exit))
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
 

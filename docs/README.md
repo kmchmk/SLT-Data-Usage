@@ -27,7 +27,7 @@ How to install:
 2. Install the downloaded file.
 2. App will start automatically after the installation.
 3. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
-4. You will see a system tray icon containing your data usage summary. Hover over to see the full report.
+4. You will see a system tray icon with your data usage summary. Left click on it to refresh and hover over to see the full report.
 5. Move it out to the taskbar from system tray, if you want to see it directly all the time.
 
 ## MacOS
@@ -36,7 +36,7 @@ How to install:
 2. Drag the downloaded file to Applications folder.
 3. Go to Applications folder, right click on the app icon and select open. You might not be able to run the app using launchpad at first.
 4. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
-5. You will see a system tray icon containing your data usage summary. Hover over to see the full report.
+5. You will see a system tray icon with your data usage summary. Hover over to see the full report.
 6. Set the app to start at login. See here: [Mac OS X: Change Which Apps Start Automatically at Login](https://www.howtogeek.com/206178/mac-os-x-change-which-apps-start-automatically-at-login/)
 
 _Auto refresh interval is 120 secs._
