@@ -1,6 +1,11 @@
 
 import rumps
 
+
+# defining constants for data types in SLT
+BONUS_DATA_SUMMARY = 'bonus_data_summary'
+EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
+VAS_DATA_SUMMARY = 'vas_data_summary'
 class MacOSTrayIcon(rumps.App):
     def format_usage(self, usage, no_text=False):
         if usage == "": return "No Data"

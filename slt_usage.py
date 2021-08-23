@@ -15,6 +15,10 @@ import darkdetect
 
 REFRESH_INTERVAL = 120  # seconds
 
+# defining constants for data types in SLT
+BONUS_DATA_SUMMARY = 'bonus_data_summary'
+EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
+VAS_DATA_SUMMARY = 'vas_data_summary'
 
 class Utils:
 
@@ -30,12 +34,15 @@ class Utils:
     def isUbuntu():
         return platform.system() == "Linux"   # Probably Ubuntu
 
+    def isMac():
+        return platform.system() == "Darwin"
+
     def get_font():
         if platform.system() == "Windows":
             return ImageFont.truetype("tahoma.ttf", Utils.get_font_size_half())
         elif Utils.isUbuntu():
             return ImageFont.truetype("UbuntuMono-R.ttf", Utils.get_font_size_half())
-        elif platform.system() == "Darwin":  # MacOS
+        elif Utils.isMac():
             return ImageFont.truetype("Symbol.ttf", Utils.get_font_size_half())
         else:
             raise Exception(
@@ -44,10 +51,6 @@ class Utils:
     def get_location():
         return Utils._TOP_LEFT
 
-# defining constants for data types in SLT
-BONUS_DATA_SUMMARY = 'bonus_data_summary'
-EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
-VAS_DATA_SUMMARY = 'vas_data_summary'
 
 class CredentialManager:
 
@@ -181,7 +184,7 @@ class DataUsage:
                 'authorization': "Bearer {}".format(access_token)
             }
             self._response = json.loads(requests.request("GET", url, headers=headers).text)
-            self.package_name = self._response["my_package_info"]["package_name"]
+            self._package_name = self._response["my_package_info"]["package_name"]
         except:
             self._response = None
         return bool(self._response)
@@ -189,7 +192,7 @@ class DataUsage:
     def get_summary(self):
         if(not self._response):
             return "X"
-        elif(self.package_name.startswith("UNLIMITED FLASH")):
+        elif(self._package_name.startswith("UNLIMITED FLASH")):
             return self._response["vas_data_summary"]["used"]
         else:
             return self._response["my_package_info"]["usageDetails"][1]["used"]
@@ -199,11 +202,9 @@ class DataUsage:
             bonus_used = self._response[data_type]["used"]
             bonus_limit = self._response[data_type]["limit"]
             return "{}: {} / {}".format(reference, bonus_used, bonus_limit)
-        else:
-            return ""
 
     def get_package_name(self):
-        return self.package_name
+        return self._package_name
 
     def get_anytime_report(self):
         if (len(self._response["my_package_info"]["usageDetails"]) > 0):
@@ -219,18 +220,17 @@ class DataUsage:
                 total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
                 total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
                 return "Night: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
-                                                    round(float(total_limit) - float(anytime_limit), 1))
+                                               round(float(total_limit) - float(anytime_limit), 1))
 
     def get_total_report(self):
-        if (len(self._response["my_package_info"]["usageDetails"]) > 0):
-            if (len(self._response["my_package_info"]["usageDetails"]) > 1):
-                total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
-                total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
-                return "Total: {} / {}".format(total_used, total_limit)
+        if (len(self._response["my_package_info"]["usageDetails"]) > 1):
+            total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
+            total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
+            return "Total: {} / {}".format(total_used, total_limit)
 
     def format_line(self, usage):
-        if usage != "":
-            return "\n" + usage
+        if(usage):
+            return "\n{}".format(usage)
         return ""
 
     def get_usage_report(self):
@@ -238,8 +238,7 @@ class DataUsage:
             return "Error occured!\nPlease refresh again."
 
         # Let's creat a full report
-        report = self.package_name
-
+        report = self._package_name
         report += self.format_line(data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
         report += self.format_line(data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"))
         report += self.format_line(data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"))
@@ -312,7 +311,7 @@ while(not data_usage.refresh()):
     credential_window.start_window()
 
 # this block will be a separate representation for MacOS
-if platform.system() == "Darwin":
+if Utils.isMac():
     import mac_support
     mac_support.MacOSTrayIcon(credential_manager, data_usage).run()
 
