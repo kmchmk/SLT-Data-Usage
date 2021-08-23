@@ -10,6 +10,7 @@ import platform
 import sys
 import os.path
 import darkdetect
+import rumps
 
 SIZE = 100
 FONT_TYPE = None
@@ -25,6 +26,10 @@ else:
 TOP_LEFT = (0, 0)
 REFRESH_INTERVAL = 120  # seconds
 
+# defining constants for data types in SLT
+BONUS_DATA_SUMMARY = 'bonus_data_summary'
+EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
+VAS_DATA_SUMMARY = 'vas_data_summary'
 
 class CredentialManager:
 
@@ -169,6 +174,45 @@ class DataUsage:
         else:
             return self._response["my_package_info"]["usageDetails"][1]["used"]
 
+    def get_data_report(self, data_type, reference):
+        if (self._response[data_type]):
+            bonus_used = self._response[data_type]["used"]
+            bonus_limit = self._response[data_type]["limit"]
+            return "{}: {} / {}".format(reference, bonus_used, bonus_limit)
+        else:
+            return ""
+
+    def get_package_name(self):
+        return self.package_name
+
+    def get_anytime_report(self):
+        if (len(self._response["my_package_info"]["usageDetails"]) > 0):
+            anytime_used = self._response["my_package_info"]["usageDetails"][0]["used"]
+            anytime_limit = self._response["my_package_info"]["usageDetails"][0]["limit"]
+            return "Anytime: {} / {}".format(anytime_used, anytime_limit if anytime_limit else "Unlimited")
+
+    def get_night_report(self):
+        if (len(self._response["my_package_info"]["usageDetails"]) > 0):
+            anytime_used = self._response["my_package_info"]["usageDetails"][0]["used"]
+            anytime_limit = self._response["my_package_info"]["usageDetails"][0]["limit"]
+            if (len(self._response["my_package_info"]["usageDetails"]) > 1):
+                total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
+                total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
+                return "Night: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
+                                                    round(float(total_limit) - float(anytime_limit), 1))
+
+    def get_total_report(self):
+        if (len(self._response["my_package_info"]["usageDetails"]) > 0):
+            if (len(self._response["my_package_info"]["usageDetails"]) > 1):
+                total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
+                total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
+                return "Total: {} / {}".format(total_used, total_limit)
+
+    def format_line(self, usage):
+        if usage != "":
+            return "\n" + usage
+        return ""
+
     def get_usage_report(self):
         if(not self._response):
             return "Incorrect credentials..."
@@ -176,34 +220,13 @@ class DataUsage:
         # Let's creat a full report
         report = self.package_name
 
-        if(self._response["bonus_data_summary"]):
-            bonus_used = self._response["bonus_data_summary"]["used"]
-            bonus_limit = self._response["bonus_data_summary"]["limit"]
-            report += "\nBonus: {} / {}".format(bonus_used, bonus_limit)
+        report += self.format_line(data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
+        report += self.format_line(data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"))
+        report += self.format_line(data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"))
+        report += self.format_line(data_usage.get_anytime_report())
+        report += self.format_line(data_usage.get_night_report())
+        report += self.format_line(data_usage.get_total_report())
 
-        if(self._response["vas_data_summary"]):
-            vas_used = self._response["vas_data_summary"]["used"]
-            vas_limit = self._response["vas_data_summary"]["limit"]
-            report += "\nVAS: {} / {}".format(vas_used, vas_limit)
-
-        if(self._response["extra_gb_data_summary"]):
-            extra_gb_used = self._response["extra_gb_data_summary"]["used"]
-            extra_gb_limit = self._response["extra_gb_data_summary"]["limit"]
-            report += "\nExtra: {} / {}".format(extra_gb_used, extra_gb_limit)
-
-        if(len(self._response["my_package_info"]["usageDetails"]) > 0):
-            anytime_used = self._response["my_package_info"]["usageDetails"][0]["used"]
-            anytime_limit = self._response["my_package_info"]["usageDetails"][0]["limit"]
-            report += "\nAnytime: {} / {}".format(anytime_used,
-                                                  anytime_limit if anytime_limit else "Unlimited")
-
-            if(len(self._response["my_package_info"]["usageDetails"]) > 1):
-                total_used = self._response["my_package_info"]["usageDetails"][1]["used"]
-                total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
-                report += "\nNight: {} / {}".format(round(float(total_used) - float(anytime_used), 1),
-                                                    round(float(total_limit) - float(anytime_limit), 1))
-                report += "\nTotal: {} / {}".format(total_used, total_limit)
-        
         reported_time = self._response["my_package_info"]["reported_time"]
         report += "\n[As at {}]".format(reported_time)
         return report
@@ -255,6 +278,97 @@ class SystemTrayIcon:
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
 
+class MacOSTrayIcon(rumps.App):
+    def format_usage(self, usage, no_text=False):
+        if usage == "": return "No Data"
+        if no_text: return usage.split(": ")[1].replace("/ ", "(") + ")"
+        return usage.replace("/ ", "(") + ")"
+
+    def __init__(self, credential_manager, data_usage):
+        self.selected = "Anytime"
+        self.no_text_view = False
+        super(MacOSTrayIcon, self).__init__(self.format_usage(data_usage.get_anytime_report()))
+        self.menu = [data_usage.get_package_name(), ["Change View", ["Anytime", "Night Time", "Total", "Extra GB", "VAS", "Bonus Data", "No Text View"]],
+                     "View Summary", "Logout & Quit"]
+        self._data_usage = data_usage
+        self._credential_manager = credential_manager
+
+    def refresh_views(self):
+        if self.selected == "Anytime": self.anytime_onoff("")
+        if self.selected == "Night Time": self.nighttime_onoff("")
+        if self.selected == "Total": self.total_onoff("")
+        if self.selected == "Extra GB": self.extragb_onoff("")
+        if self.selected == "VAS": self.vas_onoff("")
+        if self.selected == "Bonus Data": self.bonus_onoff("")
+
+    @rumps.clicked("Change View", "No Text View")
+    def update_text_view(self, sender):
+        sender.state = not sender.state
+        self.no_text_view = not self.no_text_view
+        self.refresh_views()
+
+    @rumps.clicked("View Summary")
+    def view_summary(self, _):
+        rumps.alert(self._data_usage.get_usage_report())
+
+    @rumps.clicked("Logout & Quit")
+    def view_summary(self, _):
+        self._credential_manager.write_credentials_to_file("", "")
+        rumps.quit_application()
+
+    @rumps.clicked("Change View", "Anytime")
+    def anytime_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_anytime_report(), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_anytime_report()))
+        self.selected = "Anytime"
+
+    @rumps.clicked("Change View", "Night Time")
+    def nighttime_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_night_report(), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_night_report()))
+        self.selected = "Night Time"
+
+    @rumps.clicked("Change View", "Total")
+    def total_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_total_report(), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_total_report()))
+        self.selected = "Total"
+
+    @rumps.clicked("Change View", "Extra GB")
+    def extragb_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra")))
+        self.selected = "Extra GB"
+
+    @rumps.clicked("Change View", "VAS")
+    def vas_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS")))
+        self.selected = "VAS"
+
+    @rumps.clicked("Change View", "Bonus Data")
+    def bonus_onoff(self, sender):
+        if self.no_text_view:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"), True))
+        else:
+            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus")))
+        self.selected = "Bonus Data"
+
+    @rumps.timer(300)
+    def refresh_content(self, sender):
+        self._data_usage.refresh()
+        self.refresh_views()
+
 
 credential_manager = CredentialManager()
 data_usage = DataUsage(credential_manager)
@@ -263,5 +377,10 @@ while(not data_usage.refresh()):
     credential_window = CredentialWindow(credential_manager)
     credential_window.start_window()
 
-main = SystemTrayIcon(credential_manager, data_usage)
-main.start_tray_icon()
+# this block will be a separate representation for MacOS
+if platform.system() == "Darwin":
+    MacOSTrayIcon(credential_manager, data_usage).run()
+
+else:
+    main = SystemTrayIcon(credential_manager, data_usage)
+    main.start_tray_icon()

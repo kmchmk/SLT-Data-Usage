@@ -50,7 +50,7 @@ _Auto refresh interval is 120 secs._
 Initial setup:
 ```
 # For all OSs
-pip install pystray requests darkdetect
+pip install -r requirements.txt
 
 # For Ubuntu
 sudo apt install gir1.2-appindicator3-0.1
@@ -63,7 +63,7 @@ brew install python-tk
 
 To run from code:
 ```
-python3 SLT_Usage.py
+python3 slt_usage.py
 ```
 
 Create executable:
@@ -72,13 +72,13 @@ Create executable:
 pip3 install pyinstaller
 
 # For Windows
-pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'SLT_Usage.py'
+pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'slt_usage.py'
 
 # For Ubuntu
-pyinstaller --hidden-import 'pystray._appindicator' --hidden-import 'pystray._gtk' --hidden-import 'pystray._xorg' --noconsole --onefile 'SLT_Usage.py'
+pyinstaller --hidden-import 'pystray._appindicator' --hidden-import 'pystray._gtk' --hidden-import 'pystray._xorg' --noconsole --onefile 'slt_usage.py'
 
 # For MacOS
-pyinstaller --hidden-import 'pystray._darwin' --noconsole --onefile 'SLT_Usage.py'
+pyinstaller --hidden-import 'pystray._darwin' --noconsole --onefile 'slt_usage.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
