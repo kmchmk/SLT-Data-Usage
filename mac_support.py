@@ -5,11 +5,9 @@ import pystray._darwin
 
 
 class MacOSUtils(Utils):
-    def get_font():
-        return ImageFont.truetype("Symbol.ttf", Utils.get_font_size_half())
+    def get_font(self):
+        return ImageFont.truetype("Symbol.ttf", self.get_font_size_half())
     
-    def isMac():
-        return platform.system() == "Darwin"
 
 class MacOSTrayIcon(rumps.App):
     def format_usage(self, usage, no_text=False):

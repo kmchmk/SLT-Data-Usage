@@ -4,13 +4,10 @@ import pystray._appindicator
 
 class UbuntuUtils(Utils):
 
-    def isUbuntu():
-        return platform.system() == "Linux"   # Probably Ubuntu
+    def get_font(self):
+        return ImageFont.truetype("UbuntuMono-R.ttf", self.get_font_size_half())
 
-    def get_font():
-        return ImageFont.truetype("UbuntuMono-R.ttf", Utils.get_font_size_half())
-
-    def _get_font_colour(self):  # This doesn't support custom themes yet
+    def get_font_colour(self):  # This doesn't support custom themes yet
         return 'white'  # Seems, Ubuntu top bar is always dark
 
 

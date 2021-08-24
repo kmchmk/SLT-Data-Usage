@@ -35,7 +35,7 @@ class Utils:
     def get_location(self):
         return self._TOP_LEFT
 
-    def _get_font_colour(self):  # This doesn't support custom themes yet
+    def get_font_colour(self):  # This doesn't support custom themes yet
         if(darkdetect.isDark()):
             return 'white'
         else:
@@ -256,7 +256,7 @@ class SystemTrayIcon:
         draw = ImageDraw.Draw(image)
         self._data_usage.refresh()
         draw.text(self._utils.get_location(), self._data_usage.get_summary(),
-                  font=self._utils.get_font(), fill=self._utils._get_font_colour())
+                  font=self._utils.get_font(), fill=self._utils.get_font_colour())
         icon.icon = image
         icon.title = self._data_usage.get_usage_report()
 
