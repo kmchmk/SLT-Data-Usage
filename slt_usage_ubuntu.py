@@ -5,7 +5,7 @@ import pystray._appindicator
 class UbuntuUtils(Utils):
 
     def get_font(self):
-        return ImageFont.truetype("UbuntuMono-R.ttf", self.get_font_size_half())
+        return ImageFont.truetype("/usr/share/fonts/truetype/ubuntu/UbuntuMono-R.ttf", self.get_font_size_half())
 
     def get_font_colour(self):  # This doesn't support custom themes yet
         return 'white'  # Seems, Ubuntu top bar is always dark
