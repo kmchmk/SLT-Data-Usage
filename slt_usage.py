@@ -20,36 +20,26 @@ BONUS_DATA_SUMMARY = 'bonus_data_summary'
 EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
 VAS_DATA_SUMMARY = 'vas_data_summary'
 
+
 class Utils:
 
     _SIZE = 100
     _TOP_LEFT = (0, 0)
 
-    def get_font_size():
-        return Utils._SIZE
+    def get_font_size(self):
+        return self._SIZE
 
-    def get_font_size_half():
-        return Utils.get_font_size()//2
+    def get_font_size_half(self):
+        return self.get_font_size()//2
 
-    def isUbuntu():
-        return platform.system() == "Linux"   # Probably Ubuntu
+    def get_location(self):
+        return self._TOP_LEFT
 
-    def isMac():
-        return platform.system() == "Darwin"
-
-    def get_font():
-        if platform.system() == "Windows":
-            return ImageFont.truetype("tahoma.ttf", Utils.get_font_size_half())
-        elif Utils.isUbuntu():
-            return ImageFont.truetype("UbuntuMono-R.ttf", Utils.get_font_size_half())
-        elif Utils.isMac():
-            return ImageFont.truetype("Symbol.ttf", Utils.get_font_size_half())
+    def _get_font_colour(self):  # This doesn't support custom themes yet
+        if(darkdetect.isDark()):
+            return 'white'
         else:
-            raise Exception(
-                "Sorry, we do not support '{}' OS yet.".format(platform.system()))
-
-    def get_location():
-        return Utils._TOP_LEFT
+            return 'black'
 
 
 class CredentialManager:
@@ -228,7 +218,7 @@ class DataUsage:
             total_limit = self._response["my_package_info"]["usageDetails"][1]["limit"]
             return "Total: {} / {}".format(total_used, total_limit)
 
-    def format_line(self, usage):
+    def _format_line(self, usage):
         if(usage):
             return "\n{}".format(usage)
         return ""
@@ -239,12 +229,12 @@ class DataUsage:
 
         # Let's creat a full report
         report = self._package_name
-        report += self.format_line(data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
-        report += self.format_line(data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"))
-        report += self.format_line(data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"))
-        report += self.format_line(data_usage.get_anytime_report())
-        report += self.format_line(data_usage.get_night_report())
-        report += self.format_line(data_usage.get_total_report())
+        report += self._format_line(self.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
+        report += self._format_line(self.get_data_report(VAS_DATA_SUMMARY, "VAS"))
+        report += self._format_line(self.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"))
+        report += self._format_line(self.get_anytime_report())
+        report += self._format_line(self.get_night_report())
+        report += self._format_line(self.get_total_report())
 
         reported_time = self._response["my_package_info"]["reported_time"]
         report += "\n[As at {}]".format(reported_time)
@@ -253,27 +243,20 @@ class DataUsage:
 
 class SystemTrayIcon:
 
-    def __init__(self, credential_manager, data_usage):
+    def __init__(self, credential_manager, data_usage, utils):
         self._credential_manager = credential_manager
         self._data_usage = data_usage
+        self._utils = utils
 
     def get_empty_image(self):
-        return Image.new('RGBA', (Utils.get_font_size(), Utils.get_font_size_half()))  # Empty image
-
-    def _get_font_colour(self):  # This doesn't support custom themes yet
-        if(platform.system() == "Linux"):  # Seems, Ubuntu top bar is always dark
-            return 'white'
-        elif(darkdetect.isDark()):
-            return 'white'
-        else:
-            return 'black'
+        return Image.new('RGBA', (self._utils.get_font_size(), self._utils.get_font_size_half()))  # Empty image
 
     def refresh(self, icon):
         image = self.get_empty_image()
         draw = ImageDraw.Draw(image)
         self._data_usage.refresh()
-        draw.text(Utils.get_location(), self._data_usage.get_summary(),
-                  font=Utils.get_font(), fill=self._get_font_colour())
+        draw.text(self._utils.get_location(), self._data_usage.get_summary(),
+                  font=self._utils.get_font(), fill=self._utils._get_font_colour())
         icon.icon = image
         icon.title = self._data_usage.get_usage_report()
 
@@ -296,25 +279,20 @@ class SystemTrayIcon:
 
     def start_tray_icon(self):
         menu = pystray.Menu(pystray.MenuItem('Refresh', self.refresh, default=True),
-                            pystray.MenuItem('Full report', self.show_full_report, visible=Utils.isUbuntu()),
                             pystray.MenuItem('Exit', self.exit_method),
                             pystray.MenuItem('Logout & exit', self.logout_and_exit))
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
 
 
-credential_manager = CredentialManager()
-data_usage = DataUsage(credential_manager)
+if __name__ == "__main__":
+    credential_manager = CredentialManager()
+    data_usage = DataUsage(credential_manager)
 
-while(not data_usage.refresh()):
-    credential_window = CredentialWindow(credential_manager)
-    credential_window.start_window()
+    while(not data_usage.refresh()):
+        credential_window = CredentialWindow(credential_manager)
+        credential_window.start_window()
 
-# this block will be a separate representation for MacOS
-if Utils.isMac():
-    import mac_support
-    mac_support.MacOSTrayIcon(credential_manager, data_usage).run()
-
-else:
-    main = SystemTrayIcon(credential_manager, data_usage)
-    main.start_tray_icon()
+    else:
+        main = SystemTrayIcon(credential_manager, data_usage)
+        main.start_tray_icon()

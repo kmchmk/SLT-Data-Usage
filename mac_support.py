@@ -1,11 +1,16 @@
 
 import rumps
+from slt_usage import *
+import pystray._darwin
 
 
-# defining constants for data types in SLT
-BONUS_DATA_SUMMARY = 'bonus_data_summary'
-EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
-VAS_DATA_SUMMARY = 'vas_data_summary'
+class MacOSUtils(Utils):
+    def get_font():
+        return ImageFont.truetype("Symbol.ttf", Utils.get_font_size_half())
+    
+    def isMac():
+        return platform.system() == "Darwin"
+
 class MacOSTrayIcon(rumps.App):
     def format_usage(self, usage, no_text=False):
         if usage == "": return "No Data"
@@ -96,3 +101,16 @@ class MacOSTrayIcon(rumps.App):
     def refresh_content(self, sender):
         self._data_usage.refresh()
         self.refresh_views()
+
+
+if __name__ == "__main__":
+    credential_manager = CredentialManager()
+    data_usage = DataUsage(credential_manager)
+    utils = MacOSUtils()
+
+    while(not data_usage.refresh()):
+        credential_window = CredentialWindow(credential_manager)
+        credential_window.start_window()
+
+    # this block will be a separate representation for MacOS
+    MacOSTrayIcon(credential_manager, data_usage).run()
