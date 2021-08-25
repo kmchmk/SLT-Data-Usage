@@ -288,11 +288,12 @@ class SystemTrayIcon:
 if __name__ == "__main__":
     credential_manager = CredentialManager()
     data_usage = DataUsage(credential_manager)
+    utils = Utils()
 
     while(not data_usage.refresh()):
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()
 
     else:
-        main = SystemTrayIcon(credential_manager, data_usage)
+        main = SystemTrayIcon(credential_manager, data_usage, utils)
         main.start_tray_icon()
