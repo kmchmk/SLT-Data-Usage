@@ -78,7 +78,7 @@ pyinstaller --noconsole --onefile 'slt_usage_windows.py'
 pyinstaller --noconsole --onefile 'slt_usage_ubuntu.py'
 
 # For MacOS
-pyinstaller --noconsole --onefile 'mac_support.py'
+pyinstaller --noconsole --onefile 'slt_usage_macos.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
