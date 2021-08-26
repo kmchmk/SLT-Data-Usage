@@ -1,12 +1,11 @@
 import pystray
 from tkinter import *
-from PIL import ImageDraw, ImageFont, Image
+from PIL import ImageDraw, Image
 import time
 import requests
 import json
 import urllib.parse
 import base64
-import platform
 import sys
 import os.path
 import os
@@ -251,10 +250,10 @@ class SystemTrayIcon:
     def get_empty_image(self):
         return Image.new('RGBA', (self._utils.get_font_size(), self._utils.get_font_size_half()))  # Empty image
 
-    def refresh(self, icon):
+    def display_value(self, icon):
+        self._data_usage.refresh()
         image = self.get_empty_image()
         draw = ImageDraw.Draw(image)
-        self._data_usage.refresh()
         draw.text(self._utils.get_location(), self._data_usage.get_summary(),
                   font=self._utils.get_font(), fill=self._utils.get_font_colour())
         icon.icon = image
@@ -263,7 +262,7 @@ class SystemTrayIcon:
     def update_forever(self, icon):
         icon.visible = True
         while icon.visible:
-            self.refresh(icon)
+            self.display_value(icon)
             time.sleep(REFRESH_INTERVAL)
         icon.stop()
 
@@ -278,7 +277,7 @@ class SystemTrayIcon:
         self.exit_method(icon)
 
     def start_tray_icon(self):
-        menu = pystray.Menu(pystray.MenuItem('Refresh', self.refresh, default=True),
+        menu = pystray.Menu(pystray.MenuItem('Refresh', self.display_value, default=True),
                             pystray.MenuItem('Exit', self.exit_method),
                             pystray.MenuItem('Logout & exit', self.logout_and_exit))
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)

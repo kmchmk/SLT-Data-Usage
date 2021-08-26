@@ -1,5 +1,6 @@
 from slt_usage import *
-import pystray._win32
+import pystray._win32 # This is required
+from PIL import ImageFont
 
 
 class WindowsUtils(Utils):

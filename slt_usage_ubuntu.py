@@ -1,5 +1,6 @@
 from slt_usage import *
 import pystray._appindicator
+from PIL import ImageFont
 
 
 class UbuntuUtils(Utils):
