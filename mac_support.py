@@ -1,18 +1,23 @@
 
 import rumps
+from slt_usage import *
+import pystray._darwin
 
 
-# defining constants for data types in SLT
-BONUS_DATA_SUMMARY = 'bonus_data_summary'
-EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
-VAS_DATA_SUMMARY = 'vas_data_summary'
+class MacOSUtils(Utils):
+    def get_font(self):
+        return ImageFont.truetype("Symbol.ttf", self.get_font_size_half())
+    
+
 class MacOSTrayIcon(rumps.App):
-    def format_usage(self, usage, no_text=False):
-        if usage == "": return "No Data"
-        if no_text: return usage.split(": ")[1].replace("/ ", "(") + ")"
-        return usage.replace("/ ", "(") + ")"
+    def format_usage(self, usage):
+        if(usage):
+            if self.no_text_view:
+                return usage.split(": ")[1].replace("/ ", "(") + ")"
+            return usage.replace("/ ", "(") + ")"
+        return "No Data"
 
-    def __init__(self, credential_manager, data_usage):
+    def __init__(self, credential_manager, data_usage, utils):
         self.selected = "Anytime"
         self.no_text_view = False
         super(MacOSTrayIcon, self).__init__(self.format_usage(data_usage.get_anytime_report()))
@@ -20,6 +25,7 @@ class MacOSTrayIcon(rumps.App):
                      "View Summary", "Logout & Quit"]
         self._data_usage = data_usage
         self._credential_manager = credential_manager
+        self._utils = utils
 
     def refresh_views(self):
         if self.selected == "Anytime": self.anytime_onoff("")
@@ -40,59 +46,54 @@ class MacOSTrayIcon(rumps.App):
         rumps.alert(self._data_usage.get_usage_report())
 
     @rumps.clicked("Logout & Quit")
-    def view_summary(self, _):
+    def logout_and_quit(self, _):
         self._credential_manager.write_credentials_to_file("", "")
         rumps.quit_application()
 
     @rumps.clicked("Change View", "Anytime")
     def anytime_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_anytime_report(), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_anytime_report()))
+        self.title = self.format_usage(self._data_usage.get_anytime_report())
         self.selected = "Anytime"
 
     @rumps.clicked("Change View", "Night Time")
     def nighttime_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_night_report(), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_night_report()))
+        self.title = self.format_usage(self._data_usage.get_night_report())
         self.selected = "Night Time"
 
     @rumps.clicked("Change View", "Total")
     def total_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_total_report(), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_total_report()))
+        self.title = self.format_usage(self._data_usage.get_total_report())
         self.selected = "Total"
 
     @rumps.clicked("Change View", "Extra GB")
     def extragb_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra")))
+        self.title = self.format_usage(self._data_usage.get_data_report(EXTRA_GB_DATA_SUMMARY, "Extra"))
         self.selected = "Extra GB"
 
     @rumps.clicked("Change View", "VAS")
     def vas_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS")))
+        self.title = self.format_usage(self._data_usage.get_data_report(VAS_DATA_SUMMARY, "VAS"))
         self.selected = "VAS"
 
     @rumps.clicked("Change View", "Bonus Data")
     def bonus_onoff(self, sender):
-        if self.no_text_view:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"), True))
-        else:
-            super(MacOSTrayIcon, self).__init__(self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus")))
+        self.title = self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
         self.selected = "Bonus Data"
 
     @rumps.timer(300)
     def refresh_content(self, sender):
         self._data_usage.refresh()
         self.refresh_views()
+
+
+if __name__ == "__main__":
+    credential_manager = CredentialManager()
+    data_usage = DataUsage(credential_manager)
+    utils = MacOSUtils()
+
+    while(not data_usage.refresh()):
+        credential_window = CredentialWindow(credential_manager)
+        credential_window.start_window()
+
+    # this block will be a separate representation for MacOS
+    MacOSTrayIcon(credential_manager, data_usage, utils).run()

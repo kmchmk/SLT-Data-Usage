@@ -72,13 +72,13 @@ Create executable:
 pip3 install pyinstaller
 
 # For Windows
-pyinstaller --hidden-import 'pystray._win32' --noconsole --onefile 'slt_usage.py'
+pyinstaller --noconsole --onefile 'slt_usage_windows.py'
 
 # For Ubuntu
-pyinstaller --hidden-import 'pystray._appindicator' --hidden-import 'pystray._gtk' --hidden-import 'pystray._xorg' --noconsole --onefile 'slt_usage.py'
+pyinstaller --noconsole --onefile 'slt_usage_ubuntu.py'
 
 # For MacOS
-pyinstaller --hidden-import 'pystray._darwin' --noconsole --onefile 'slt_usage.py'
+pyinstaller --noconsole --onefile 'mac_support.py'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
