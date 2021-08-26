@@ -1,15 +1,20 @@
 
 import rumps
 from slt_usage import *
-import pystray._darwin
-
-
-class MacOSUtils(Utils):
-    def get_font(self):
-        return ImageFont.truetype("Symbol.ttf", self.get_font_size_half())
     
 
-class MacOSTrayIcon(rumps.App):
+class MacOSSystemTrayIcon(rumps.App):
+
+    def __init__(self, credential_manager, data_usage):
+        self.selected = "Anytime"
+        self.no_text_view = False
+        super(MacOSSystemTrayIcon, self).__init__(self.format_usage(data_usage.get_anytime_report()))
+        self.menu = [data_usage.get_package_name(), ["Change View", ["Anytime", "Night Time", "Total", "Extra GB", "VAS", "Bonus Data", "No Text View"]],
+                     "View Summary", "Logout & Quit"]
+        self._data_usage = data_usage
+        self._credential_manager = credential_manager
+
+
     def format_usage(self, usage):
         if(usage):
             if self.no_text_view:
@@ -17,15 +22,6 @@ class MacOSTrayIcon(rumps.App):
             return usage.replace("/ ", "(") + ")"
         return "No Data"
 
-    def __init__(self, credential_manager, data_usage, utils):
-        self.selected = "Anytime"
-        self.no_text_view = False
-        super(MacOSTrayIcon, self).__init__(self.format_usage(data_usage.get_anytime_report()))
-        self.menu = [data_usage.get_package_name(), ["Change View", ["Anytime", "Night Time", "Total", "Extra GB", "VAS", "Bonus Data", "No Text View"]],
-                     "View Summary", "Logout & Quit"]
-        self._data_usage = data_usage
-        self._credential_manager = credential_manager
-        self._utils = utils
 
     def refresh_views(self):
         if self.selected == "Anytime": self.anytime_onoff("")
@@ -80,7 +76,7 @@ class MacOSTrayIcon(rumps.App):
         self.title = self.format_usage(self._data_usage.get_data_report(BONUS_DATA_SUMMARY, "Bonus"))
         self.selected = "Bonus Data"
 
-    @rumps.timer(300)
+    @rumps.timer(REFRESH_INTERVAL)
     def refresh_content(self, sender):
         self._data_usage.refresh()
         self.refresh_views()
@@ -89,11 +85,11 @@ class MacOSTrayIcon(rumps.App):
 if __name__ == "__main__":
     credential_manager = CredentialManager()
     data_usage = DataUsage(credential_manager)
-    utils = MacOSUtils()
 
     while(not data_usage.refresh()):
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()
 
     # this block will be a separate representation for MacOS
-    MacOSTrayIcon(credential_manager, data_usage, utils).run()
+    main = MacOSSystemTrayIcon(credential_manager, data_usage)
+    main.run()

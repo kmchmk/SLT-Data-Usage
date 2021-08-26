@@ -26,6 +26,7 @@ if __name__ == "__main__":
     credential_manager = CredentialManager()
     data_usage = DataUsage(credential_manager)
     utils = UbuntuUtils()
+
     while(not data_usage.refresh()):
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()

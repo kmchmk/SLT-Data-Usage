@@ -1,4 +1,4 @@
-pystray==0.17.3
+pystray==0.17.3; sys_platform != 'darwin'
 requests==2.26.0
-darkdetect==0.3.1
+darkdetect==0.3.1; sys_platform != 'darwin'
 rumps==0.3.0; sys_platform == 'darwin'

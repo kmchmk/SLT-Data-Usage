@@ -293,6 +293,5 @@ if __name__ == "__main__":
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()
 
-    else:
-        main = SystemTrayIcon(credential_manager, data_usage, utils)
-        main.start_tray_icon()
+    main = SystemTrayIcon(credential_manager, data_usage, utils)
+    main.start_tray_icon()

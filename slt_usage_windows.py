@@ -1,5 +1,5 @@
 from slt_usage import *
-import pystray._win32 # This is required
+import pystray._win32  # This is required
 from PIL import ImageFont
 
 
@@ -17,6 +17,5 @@ if __name__ == "__main__":
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()
 
-    else:
-        main = SystemTrayIcon(credential_manager, data_usage, utils)
-        main.start_tray_icon()
+    main = SystemTrayIcon(credential_manager, data_usage, utils)
+    main.start_tray_icon()
