@@ -8,6 +8,10 @@ class WindowsUtils(Utils):
         return ImageFont.truetype("tahoma.ttf", self.get_font_size_half())
 
 
+class WindowsSystemTrayIcon(SystemTrayIcon):
+    pass
+
+
 if __name__ == "__main__":
     credential_manager = CredentialManager()
     data_usage = DataUsage(credential_manager)
@@ -17,5 +21,5 @@ if __name__ == "__main__":
         credential_window = CredentialWindow(credential_manager)
         credential_window.start_window()
 
-    main = SystemTrayIcon(credential_manager, data_usage, utils)
+    main = WindowsSystemTrayIcon(credential_manager, data_usage, utils)
     main.start_tray_icon()

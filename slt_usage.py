@@ -13,7 +13,7 @@ import darkdetect
 
 
 REFRESH_INTERVAL = 120  # seconds
-
+TEST_MODE = False # Temporary value added for testing purposes
 # defining constants for data types in SLT
 BONUS_DATA_SUMMARY = 'bonus_data_summary'
 EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
@@ -153,6 +153,11 @@ class DataUsage:
         self._credential_manager = credential_manager
 
     def refresh(self):
+        if(TEST_MODE):  # This block is added for testing purposes
+            self._response = json.loads(
+                '{"status":"NORMAL","reported_time":"26-Aug-2021 07:36 PM","my_package_summary":{"limit":"76.7","used":"35.4","volume_unit":"GB"},"bonus_data_summary":{"limit":"6.6","used":"6.6","volume_unit":"GB"},"free_data_summary":null,"vas_data_summary":null,"extra_gb_data_summary":null,"my_package_info":{"package_name":"WEB FAMILY PLUS","package_summary":null,"usageDetails":[{"name":"Standard","limit":"30.7","remaining":"4.4","used":"26.3","percentage":14,"volume_unit":"GB","expiry_date":"31-Aug","claim":null,"unsubscribable":false,"timestamp":0,"subscriptionid":null},{"name":"Total (Standard + Free)","limit":"76.7","remaining":"41.3","used":"135.4","percentage":54,"volume_unit":"GB","expiry_date":"31-Aug","claim":null,"unsubscribable":false,"timestamp":0,"subscriptionid":null}],"reported_time":"26-Aug-2021 07:36 PM"}}')
+            self._package_name = self._response["my_package_info"]["package_name"]
+            return True
         # Get access token first
         payload = "client_id={1}&grant_type=refresh_token&refresh_token={0}&scope=scope1".format(
             urllib.parse.quote(self._credential_manager.get_refresh_token()), self.X_IBM_CLIENT_ID)
