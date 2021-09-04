@@ -71,33 +71,20 @@ brew install python-tk
 
 To run from code:
 ```
-# For Windows
-python3 slt_usage_windows.py
-
-# For Ubuntu
-python3 slt_usage_ubuntu.py
-
-# For MacOS
-python3 slt_usage_macos.py
+# For all OSs
+python3 runner.py
 ```
 
 Create executable:
 ```
 # For all OSs
 pip3 install pyinstaller
-
-# For Windows
-pyinstaller --noconsole --onefile 'slt_usage_windows.py'
-
-# For Ubuntu
-pyinstaller --noconsole --onefile 'slt_usage_ubuntu.py'
-
-# For MacOS
-pyinstaller --noconsole --onefile 'slt_usage_macos.py'
+pyinstaller --noconsole --onefile 'runner.py' --name 'slt_usage'
 ```
 
 Create [InnoSetup](https://jrsoftware.org/isinfo.php) installer:
 ```
+# For Windows
 iscc InnoSetup_offline_installer_script.iss
 iscc InnoSetup_web_installer_script.iss
 ```

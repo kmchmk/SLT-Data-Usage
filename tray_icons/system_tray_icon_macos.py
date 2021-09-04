@@ -1,5 +1,6 @@
 import rumps
-from modules.CredentialManager import *
+from modules.usage_manager import *
+
 
 class MacOSSystemTrayIcon(rumps.App):
 
@@ -82,16 +83,3 @@ class MacOSSystemTrayIcon(rumps.App):
     def refresh_content(self, sender):
         self._data_usage.refresh()
         self.menu.get("Change View").get(self.selected).callback(None)
-
-
-if __name__ == "__main__":
-    credential_manager = CredentialManager()
-    data_usage = DataUsage(credential_manager)
-
-    while(not data_usage.refresh()):
-        credential_window = CredentialWindow(credential_manager)
-        credential_window.start_window()
-
-    # this block will be a separate representation for MacOS
-    main = MacOSSystemTrayIcon(credential_manager, data_usage)
-    main.run()

@@ -1,8 +1,31 @@
-from modules.CredentialManager import *
+from modules.usage_manager import *
 from tkinter import *
 import pystray
 from PIL import ImageDraw, Image
 import time
+import darkdetect
+
+
+class Utils:
+
+    _SIZE = 100
+    _TOP_LEFT = (0, 0)
+
+    def get_font_size(self):
+        return self._SIZE
+
+    def get_font_size_half(self):
+        return self.get_font_size()//2
+
+    def get_location(self):
+        return self._TOP_LEFT
+
+    def get_font_colour(self):  # This doesn't support custom themes yet
+        if(darkdetect.isDark()):
+            return 'white'
+        else:
+            return 'black'
+
 
 class SystemTrayIcon:
 
@@ -46,5 +69,3 @@ class SystemTrayIcon:
                             pystray.MenuItem('Logout & exit', self.logout_and_exit))
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
-
-
