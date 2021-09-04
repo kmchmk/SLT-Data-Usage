@@ -16,7 +16,8 @@ jobs:
       - run: sudo apt install gir1.2-appindicator3-0.1
       - run: sudo apt install python3-tk
       - run: sudo apt purge fcitx-module-dbus
-      - run: export DISPLAY=mymachine.com:0.0
+      - run: export DISPLAY=0.0
+      - run: xhost +
       - run: python3 runner.py
       - run: pip3 install pyinstaller
       - run: pyinstaller --noconsole --onefile 'runner.py' --name 'slt_usage'
