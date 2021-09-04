@@ -4,7 +4,7 @@
 #define MyAppVersion "undefined"
 #define MyAppPublisher "Chanaka Karunarathne"
 #define MyAppURL "https://github.com/kmchmk/SLT-Data-Usage#readme"
-#define MyAppExeName "SLT_Usage.exe"
+#define MyAppExeName "slt_usage_windows.exe"
 #define MyOutputDir "dist"
 #define MyOutputBaseFilename "SLT_Usage_Offline_Installer"
 

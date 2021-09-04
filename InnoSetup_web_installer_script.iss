@@ -4,10 +4,10 @@
 #define MyAppVersion "undefined"
 #define MyAppPublisher "Chanaka Karunarathne"
 #define MyAppURL "https://github.com/kmchmk/SLT-Data-Usage#readme"
-#define MyAppExeName "SLT_Usage.exe"
+#define MyAppExeName "slt_usage_windows.exe"
 #define MyOutputDir "dist"
 #define MyOutputBaseFilename "SLT_Usage_Web_Installer"
-#define MyDownloadURL "https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/SLT_Usage.exe"
+#define MyDownloadURL "https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/slt_usage_windows.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.

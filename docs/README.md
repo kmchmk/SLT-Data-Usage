@@ -23,7 +23,7 @@ How to install:
 
 ## Windows
 
-1. Download the [SLT_Usage_Web_Installer.exe](https://github.com/kmchmk/SLT-Data-Usage/releases/download/v1.3/SLT_Usage_Web_Installer.exe) file. Your browser may hesitate, so you may have to allow it in the Downloads section.
+1. Download the [SLT_Usage_Web_Installer.exe](https://github.com/kmchmk/SLT-Data-Usage/releases/download/v1.6/SLT_Usage_Web_Installer.exe) file. Your browser may hesitate, so you may have to allow it in the Downloads section.
 2. Install the downloaded file.
 2. App will start automatically after the installation.
 3. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
@@ -50,7 +50,7 @@ _Auto refresh interval is 120 secs._
 Initial setup:
 ```
 # For all OSs
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 
 # For Ubuntu
 sudo apt install gir1.2-appindicator3-0.1
@@ -63,7 +63,14 @@ brew install python-tk
 
 To run from code:
 ```
-python3 slt_usage.py
+# For Windows
+python3 slt_usage_windows.py
+
+# For Ubuntu
+python3 slt_usage_ubuntu.py
+
+# For MacOS
+python3 slt_usage_macos.py
 ```
 
 Create executable:
