@@ -13,4 +13,22 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      - run: python --version
+      - run: pip3 --version
+      - run: pip3 install -r requirements.txt
+      - run: sudo apt install gir1.2-appindicator3-0.1
+      - run: sudo apt install python3-tk
+      - run: sudo apt purge fcitx-module-dbus
+  validator2:
+    name: validate2 builds for all operating systems
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - run: pip3 --version
+      - run: pip3 install -r requirements.txt
+      - run: sudo apt install gir1.2-appindicator3-0.1
+      - run: sudo apt install python3-tk
+      - run: sudo apt purge fcitx-module-dbus
