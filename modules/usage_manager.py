@@ -1,16 +1,10 @@
-import pystray
 from tkinter import *
-from PIL import ImageDraw, Image
-import time
 import requests
 import json
 import urllib.parse
 import base64
 import sys
-import os.path
 import os
-import darkdetect
-
 
 REFRESH_INTERVAL = 120  # seconds
 TEST_MODE = False  # Temporary value added for testing purposes
@@ -19,27 +13,6 @@ TEST_MODE = False  # Temporary value added for testing purposes
 BONUS_DATA_SUMMARY = 'bonus_data_summary'
 EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
 VAS_DATA_SUMMARY = 'vas_data_summary'
-
-
-class Utils:
-
-    _SIZE = 100
-    _TOP_LEFT = (0, 0)
-
-    def get_font_size(self):
-        return self._SIZE
-
-    def get_font_size_half(self):
-        return self.get_font_size()//2
-
-    def get_location(self):
-        return self._TOP_LEFT
-
-    def get_font_colour(self):  # This doesn't support custom themes yet
-        if(darkdetect.isDark()):
-            return 'white'
-        else:
-            return 'black'
 
 
 class CredentialManager:
@@ -244,60 +217,3 @@ class DataUsage:
         reported_time = self._response["my_package_info"]["reported_time"]
         report += "\n[As at {}]".format(reported_time)
         return report
-
-
-class SystemTrayIcon:
-
-    def __init__(self, credential_manager, data_usage, utils):
-        self._credential_manager = credential_manager
-        self._data_usage = data_usage
-        self._utils = utils
-
-    def get_empty_image(self):
-        return Image.new('RGBA', (self._utils.get_font_size(), self._utils.get_font_size_half()))  # Empty image
-
-    def display_value(self, icon):
-        self._data_usage.refresh()
-        image = self.get_empty_image()
-        draw = ImageDraw.Draw(image)
-        draw.text(self._utils.get_location(), self._data_usage.get_summary(),
-                  font=self._utils.get_font(), fill=self._utils.get_font_colour())
-        icon.icon = image
-        icon.title = self._data_usage.get_usage_report()
-
-    def update_forever(self, icon):
-        icon.visible = True
-        while icon.visible:
-            self.display_value(icon)
-            time.sleep(REFRESH_INTERVAL)
-        icon.stop()
-
-    def show_full_report(self, icon):
-        icon.notify(self._data_usage.get_usage_report(), " ")
-
-    def exit_method(self, icon):
-        icon.visible = False
-
-    def logout_and_exit(self, icon):
-        self._credential_manager.write_credentials_to_file("", "")
-        self.exit_method(icon)
-
-    def start_tray_icon(self):
-        menu = pystray.Menu(pystray.MenuItem('Refresh', self.display_value, default=True),
-                            pystray.MenuItem('Exit', self.exit_method),
-                            pystray.MenuItem('Logout & exit', self.logout_and_exit))
-        icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
-        icon.run(self.update_forever)
-
-
-if __name__ == "__main__":
-    credential_manager = CredentialManager()
-    data_usage = DataUsage(credential_manager)
-    utils = Utils()
-
-    while(not data_usage.refresh()):
-        credential_window = CredentialWindow(credential_manager)
-        credential_window.start_window()
-
-    main = SystemTrayIcon(credential_manager, data_usage, utils)
-    main.start_tray_icon()

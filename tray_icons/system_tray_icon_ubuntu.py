@@ -1,6 +1,7 @@
-from slt_usage import *
-import pystray._appindicator
+from tray_icons.system_tray_icon_base import *
 from PIL import ImageFont
+
+import pystray._appindicator
 
 
 class UbuntuUtils(Utils):
@@ -20,16 +21,3 @@ class UbuntuSystemTrayIcon(SystemTrayIcon):
                             pystray.MenuItem('Logout & exit', self.logout_and_exit))
         icon = pystray.Icon("icon_name", self.get_empty_image(), "Starting...", menu)
         icon.run(self.update_forever)
-
-
-if __name__ == "__main__":
-    credential_manager = CredentialManager()
-    data_usage = DataUsage(credential_manager)
-    utils = UbuntuUtils()
-
-    while(not data_usage.refresh()):
-        credential_window = CredentialWindow(credential_manager)
-        credential_window.start_window()
-
-    main = UbuntuSystemTrayIcon(credential_manager, data_usage, utils)
-    main.start_tray_icon()
