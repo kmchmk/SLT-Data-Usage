@@ -1,5 +1,6 @@
 from tray_icons.system_tray_icon_base import *
 from PIL import ImageFont
+import pystray._win32 # This is required. Do not delete.
 
 
 class WindowsUtils(Utils):
