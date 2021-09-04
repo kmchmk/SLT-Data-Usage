@@ -1,0 +1,40 @@
+name: build validator
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  ubuntu-validator:
+    name: validate builds for the Ubuntu operating system
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v2
+      - run: pip3 install -r requirements.txt
+      - run: sudo apt install gir1.2-appindicator3-0.1
+      - run: sudo apt install python3-tk
+      - run: sudo apt purge fcitx-module-dbus
+      - run: sudo apt update
+      - run: sudo apt install xfce4 xfce4-goodies
+      - run: sudo apt install tightvncserver
+      - run: vncserver :1
+      - run: export DISPLAY=:1
+      - run: python3 runner.py
+      - run: pip3 install pyinstaller
+      - run: pyinstaller --noconsole --onefile 'runner.py' --name 'slt_usage'
+  validator2:
+    name: validate2 builds for all operating systems
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - run: pip3 --version
+      - run: pip3 install -r requirements.txt
+      - run: sudo apt install gir1.2-appindicator3-0.1
+      - run: sudo apt install python3-tk
+      - run: sudo apt purge fcitx-module-dbus
