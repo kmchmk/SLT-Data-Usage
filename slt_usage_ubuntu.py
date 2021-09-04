@@ -1,6 +1,5 @@
-from utils.credential_manager import *
-from utils.windows_ubuntu_base import *
-from utils.utils import Utils
+from utils.SystemTrayIcon import *
+from utils.Utils import Utils
 from PIL import ImageFont
 
 import pystray._appindicator

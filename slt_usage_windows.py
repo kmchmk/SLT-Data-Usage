@@ -1,5 +1,4 @@
-from utils.credential_manager import *
-from utils.windows_ubuntu_base import *
+from utils.SystemTrayIcon import *
 from PIL import ImageFont
 
 

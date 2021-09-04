@@ -1,5 +1,5 @@
 import rumps
-from utils.credential_manager import *
+from utils.CredentialManager import *
 
 class MacOSSystemTrayIcon(rumps.App):
 
