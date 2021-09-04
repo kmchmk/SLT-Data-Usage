@@ -13,7 +13,8 @@ import darkdetect
 
 
 REFRESH_INTERVAL = 120  # seconds
-TEST_MODE = False # Temporary value added for testing purposes
+TEST_MODE = False  # Temporary value added for testing purposes
+
 # defining constants for data types in SLT
 BONUS_DATA_SUMMARY = 'bonus_data_summary'
 EXTRA_GB_DATA_SUMMARY = 'extra_gb_data_summary'
