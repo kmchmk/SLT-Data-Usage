@@ -32,12 +32,20 @@ How to install:
 
 ## MacOS
 
-1. Download the  [SLT_Usage.zip](https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/SLT_Usage.zip) file.
+1. Download the  [slt_usage_macos.app.zip](https://github.com/kmchmk/SLT-Data-Usage/releases/latest/download/slt_usage_macos.app.zip) file.
 2. Drag the downloaded file to Applications folder.
 3. Go to Applications folder, right click on the app icon and select open. You might not be able to run the app using launchpad at first.
 4. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
 5. You will see a system tray icon with your data usage summary. Hover over to see the full report.
 6. Set the app to start at login. See here: [Mac OS X: Change Which Apps Start Automatically at Login](https://www.howtogeek.com/206178/mac-os-x-change-which-apps-start-automatically-at-login/)
+
+## Ubuntu
+
+1. Download the [slt_usage_ubuntu](https://github.com/kmchmk/SLT-Data-Usage/releases/download/v1.6/slt_usage_ubuntu) file. Your browser may hesitate, so you may have to allow it in the Downloads section.
+2. Run the downloaded file.
+3. Save your SLT username (Ex: 94112xxxxxx) and password using the popup window.
+4. You will see a system tray icon with your data usage summary. Left click on it to refresh or view the full report.
+
 
 _Auto refresh interval is 120 secs._
 
@@ -58,7 +66,7 @@ sudo apt install python3-tk
 sudo apt purge fcitx-module-dbus
 
 # For MacOS
-brew install python-tk
+brew install python-tk # ToDo - Check and remove. Not required anymore.
 ```
 
 To run from code:
