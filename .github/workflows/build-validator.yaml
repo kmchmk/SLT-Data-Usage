@@ -1,0 +1,19 @@
+name: build validator
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  validator:
+    name: validate builds for all operating systems
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      # Runs a single command using the runners shell
+      - name: running the config validator script
+        run: python3 ./internal-scripts/json-validator.py
+      - run: python --version
