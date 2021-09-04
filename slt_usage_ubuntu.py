@@ -1,5 +1,5 @@
-from utils.SystemTrayIcon import *
-from utils.Utils import Utils
+from modules.SystemTrayIcon import *
+from modules.Utils import Utils
 from PIL import ImageFont
 
 import pystray._appindicator

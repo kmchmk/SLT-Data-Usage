@@ -1,4 +1,4 @@
-from utils.CredentialManager import *
+from modules.CredentialManager import *
 from tkinter import *
 import pystray
 from PIL import ImageDraw, Image

@@ -1,4 +1,5 @@
-from utils.SystemTrayIcon import *
+from modules.SystemTrayIcon import *
+from modules.Utils import Utils
 from PIL import ImageFont
 
 
