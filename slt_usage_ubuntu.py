@@ -14,7 +14,7 @@ class UbuntuUtils(Utils):
 
 class UbuntuSystemTrayIcon(SystemTrayIcon):
     def start_tray_icon(self):
-        menu = pystray.Menu(pystray.MenuItem('Refresh', self.refresh, default=True),
+        menu = pystray.Menu(pystray.MenuItem('Refresh', self.display_value, default=True),
                             pystray.MenuItem('Full report', self.show_full_report),
                             pystray.MenuItem('Exit', self.exit_method),
                             pystray.MenuItem('Logout & exit', self.logout_and_exit))
