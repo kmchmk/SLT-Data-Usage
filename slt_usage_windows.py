@@ -1,5 +1,5 @@
-from slt_usage import *
-import pystray._win32  # This is required
+from utils.credential_manager import *
+from utils.windows_ubuntu_base import *
 from PIL import ImageFont
 
 
