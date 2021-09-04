@@ -1,7 +1,5 @@
-
 import rumps
 from slt_usage import *
-
 
 class MacOSSystemTrayIcon(rumps.App):
 

@@ -66,7 +66,7 @@ sudo apt install python3-tk
 sudo apt purge fcitx-module-dbus
 
 # For MacOS
-brew install python-tk # ToDo - Check and remove. Not required anymore.
+brew install python-tk 
 ```
 
 To run from code:
