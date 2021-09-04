@@ -5,7 +5,7 @@ on:
 
 jobs:
   ubuntu-validator:
-    name: validate builds for all Ubuntu operating systems
+    name: validate builds for the Ubuntu operating system
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -16,6 +16,7 @@ jobs:
       - run: sudo apt install gir1.2-appindicator3-0.1
       - run: sudo apt install python3-tk
       - run: sudo apt purge fcitx-module-dbus
+      - run: export DISPLAY=mymachine.com:0.0
       - run: python3 runner.py
       - run: pip3 install pyinstaller
       - run: pyinstaller --noconsole --onefile 'runner.py' --name 'slt_usage'
