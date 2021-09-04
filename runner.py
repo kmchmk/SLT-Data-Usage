@@ -1,5 +1,5 @@
 import platform
-from tray_icons.system_tray_icon_base import *
+from modules.usage_manager import *
 
 if __name__ == "__main__":
     credential_manager = CredentialManager()
@@ -25,6 +25,7 @@ if __name__ == "__main__":
         main.run()
     else:
         print("We do not support '{}' OS yet. Let's try...".format(platform.system()))
+        from tray_icons.system_tray_icon_base import *
         utils = Utils()
         main = SystemTrayIcon(credential_manager, data_usage, utils)
         main.start_tray_icon()
