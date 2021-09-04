@@ -1,5 +1,5 @@
-import platform
-from tray_icons.system_tray_icon_base import *
+# import platform
+# from tray_icons.system_tray_icon_base import *
 
 if __name__ == "__main__":
     credential_manager = CredentialManager()
